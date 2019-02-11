@@ -53,6 +53,14 @@ kitBuilder.prototype.initPlusButtons = function(buttons){
 			this.plusUp(e);
 		}.bind(this),false);
 
+		buttons[i].addEventListener("touchstart",function(e){
+			this.plusDown(e);
+		}.bind(this),false);
+
+		buttons[i].addEventListener("touchend",function(e){
+			this.plusUp(e);
+		}.bind(this),false);
+
 		buttons[i].addEventListener("mouseleave",function(e){
 			this.plusUp(e);
 		}.bind(this),false);
@@ -70,6 +78,14 @@ kitBuilder.prototype.initMinusButtons = function(buttons){
 		}.bind(this),false);
 
 		buttons[i].addEventListener("mouseup",function(e){
+			this.minusUp(e);
+		}.bind(this),false);
+
+		buttons[i].addEventListener("touchstart",function(e){
+			this.minusDown(e);
+		}.bind(this),false);
+
+		buttons[i].addEventListener("touchend",function(e){
 			this.minusUp(e);
 		}.bind(this),false);
 
