@@ -34,9 +34,6 @@ body {
 	right: 0px;
 }
 /*selector styles*/
-.bundle-selectors{
-	margin-top: 10px;
-}
 
 .bundle-selector-content{
 	transition: height 1s;
@@ -44,6 +41,7 @@ body {
 	-moz-transition: 1s;
 	-o-transition: 1s;
 	overflow: hidden;
+	margin-top: 10px;
 	/*height: 0px;*/
 }
 
@@ -120,6 +118,9 @@ body {
 @media (min-width: 800px){
 	.bundle-selector-content{
 		transition: height 500ms;
+		-webkit-transition: 500ms;
+		-moz-transition: 500ms;
+		-o-transition: 500ms;
 		/*height: 0px;*/
 	}
 

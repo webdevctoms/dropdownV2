@@ -114,21 +114,21 @@ kitBuilder.prototype.buttonClicked = function(event){
 	//console.log("clicked", event.currentTarget);
 	//console.log("next sibling", event.currentTarget.nextElementSibling);
 	var optionContent = event.currentTarget.nextElementSibling;
-	console.log("button children", event.currentTarget.children);
+	console.log("button ", optionContent);
 	var arrowIcon = event.currentTarget.children[1];
 
-	if(optionContent.firstElementChild.style.height === "0px"){
+	if(optionContent.style.height === "0px"){
 		arrowIcon.style.transform = "rotate(180deg)";
 		var bundleId = event.currentTarget.dataset.bundleid;
 		console.log(this.bundleHeights, bundleId);
-		optionContent.firstElementChild.style.height = this.bundleHeights[bundleId] + "px";
-		optionContent.firstElementChild.style.borderBottom = "1px solid #ddd";
+		optionContent.style.height = this.bundleHeights[bundleId] + "px";
+		optionContent.style.borderBottom = "1px solid #ddd";
 	}
 	else{
 		arrowIcon.style.transform = "rotate(0deg)";
-		optionContent.firstElementChild.style.height = "0px";
+		optionContent.style.height = "0px";
 		setTimeout(function(){
-			optionContent.firstElementChild.style.borderBottom = "none";
+			optionContent.style.borderBottom = "none";
 		},450);
 	}	
 	
