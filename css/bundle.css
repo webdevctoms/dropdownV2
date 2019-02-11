@@ -46,8 +46,10 @@ body {
 }
 
 .componenContainer{
+	/*
 	display: flex;
 	justify-content: space-between;
+	*/
 }
 
 .componentLabel{
@@ -57,7 +59,7 @@ body {
 .numberCounter{
 	margin-left: 5px;
 	margin-right: 5px;
-	width:10px;
+	max-width: 8px;
 }
 
 .controlIcon{
@@ -73,6 +75,27 @@ body {
 	font-size: 15px;
 }
 
+.priceColumn{
+	text-align: center;
+	display: none;
+}
+
+.kitTable > tbody > tr >td{
+	width: 25%;
+}
+
+.quantityContainer{
+	float: right;
+}
+
+.componentImage{
+	width: 100%;
+}
+
+.imageColumn{
+	display: none;
+}
+
 @media (min-width: 321px){
 	.componentLabel{
 		max-width: 120px;
@@ -81,6 +104,7 @@ body {
 	.numberCounter{
 		margin-left: 5px;
 		margin-right: 5px;
+		max-width: none;
 		width:15px;
 	}
 	
@@ -94,6 +118,10 @@ body {
 	.controlIcon{
 		height: 16px;
 		width: 13px;
+	}
+
+	.priceColumn{
+		display: table-cell;
 	}
 	
 }
@@ -124,6 +152,14 @@ body {
 		/*height: 0px;*/
 	}
 
+	.imageColumn{
+		display: table-cell;
+	}
+
+	.componentLabel{
+		margin-left: 8px;
+	}
+
 }
 
 @media (min-width: 1000px){
@@ -131,5 +167,11 @@ body {
 		max-width: 800px;
 	}
 
-	
+	.componentImage{
+		width: 60%;
+	}
+
+	.componentLabel{
+		margin-left: 0px;
+	}
 }
