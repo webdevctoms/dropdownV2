@@ -1,0 +1,134 @@
+body {
+  margin: 0;
+}
+/*container styles*/
+.bundle-container{
+	position: relative;
+	width: 50%;
+	margin: auto;
+}
+/*button styles*/
+.bundle-button{
+	border-bottom: 1px solid #0c0c0d;
+}
+
+.bundle-button p{
+	display: inline;
+}
+
+.bundle-button:hover{
+	cursor: pointer;
+}
+/*icon styles*/
+.arrowIcon{
+	display: inline-block;
+	width: 15px;
+	height: 18px;
+	content: "";
+	transform: rotate(0deg);
+	transition: 500ms;
+	-webkit-transition: 500ms;
+	-moz-transition: 500ms;
+	-o-transition: 500ms;
+	position: absolute;
+	right: 0px;
+}
+/*selector styles*/
+.bundle-selectors{
+	margin-top: 10px;
+}
+
+.bundle-selector-content{
+	transition: height 1s;
+	-webkit-transition: 1s;
+	-moz-transition: 1s;
+	-o-transition: 1s;
+	overflow: hidden;
+	/*height: 0px;*/
+}
+
+.componenContainer{
+	display: flex;
+	justify-content: space-between;
+}
+
+.componentLabel{
+	max-width: 105px;
+}
+
+.numberCounter{
+	margin-left: 5px;
+	margin-right: 5px;
+	width:10px;
+}
+
+.controlIcon{
+	height: 15px;
+	width: 12px;
+}
+
+.controlIcon:hover{
+	cursor: pointer;
+}
+
+.price{
+	font-size: 15px;
+}
+
+@media (min-width: 321px){
+	.componentLabel{
+		max-width: 120px;
+	}
+
+	.numberCounter{
+		margin-left: 5px;
+		margin-right: 5px;
+		width:15px;
+	}
+	
+}
+
+@media (min-width: 400px){
+	.componentLabel{
+		max-width: 125px;
+	}
+
+	.controlIcon{
+		height: 16px;
+		width: 13px;
+	}
+	
+}
+
+
+@media (min-width: 750px){
+	.componentLabel{
+		max-width: 300px;
+	}
+
+	.controlIcon{
+		height: 21px;
+		width: 19px;
+	}
+
+	.numberCounter{
+		font-size: 18px;
+	}
+	
+}
+
+@media (min-width: 800px){
+	.bundle-selector-content{
+		transition: height 500ms;
+		/*height: 0px;*/
+	}
+
+}
+
+@media (min-width: 1000px){
+	.componentLabel{
+		max-width: 800px;
+	}
+
+	
+}
