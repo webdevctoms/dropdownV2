@@ -9,6 +9,7 @@ body {
 }
 /*button styles*/
 .bundle-button{
+	padding-bottom: 5px;
 	border-bottom: 1px solid #0c0c0d;
 }
 
@@ -90,7 +91,13 @@ body {
 	margin-bottom: 8px;
 	margin-top: 8px;
 }
-
+/*
+.plusIcon:hover{
+	position: relative;
+	left:3px;
+	top:3px;
+}
+*/
 .imageColumn{
 	display: none;
 }

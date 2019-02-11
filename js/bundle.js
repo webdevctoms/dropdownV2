@@ -35,12 +35,7 @@ kitBuilder.prototype.getButtons = function(buttonIDs) {
 	for(var i = 0;i < buttonIDs.length;i++){
 		buttonArr.push(document.getElementById(buttonIDs[i]));
 	}
-	/*
-	buttonIDs.forEach(buttonId => {
-		buttonArr.push(document.getElementById(buttonId));
-	});
-	*/
-	//console.log(buttonArr);
+
 	return buttonArr;
 }
 
@@ -48,7 +43,19 @@ kitBuilder.prototype.initPlusButtons = function(buttons){
 	for(var i =0;i < buttons.length; i++){
 		buttons[i].addEventListener("click",function(e){
 			this.plusClicked(e);
-		}.bind(this),false)
+		}.bind(this),false);
+		//handles button click effect
+		buttons[i].addEventListener("mousedown",function(e){
+			this.plusDown(e);
+		}.bind(this),false);
+
+		buttons[i].addEventListener("mouseup",function(e){
+			this.plusUp(e);
+		}.bind(this),false);
+
+		buttons[i].addEventListener("mouseleave",function(e){
+			this.plusUp(e);
+		}.bind(this),false);
 	}
 }
 
@@ -56,7 +63,19 @@ kitBuilder.prototype.initMinusButtons = function(buttons){
 	for(var i =0;i < buttons.length; i++){
 		buttons[i].addEventListener("click",function(e){
 			this.minusClicked(e);
-		}.bind(this),false)
+		}.bind(this),false);
+
+		buttons[i].addEventListener("mousedown",function(e){
+			this.minusDown(e);
+		}.bind(this),false);
+
+		buttons[i].addEventListener("mouseup",function(e){
+			this.minusUp(e);
+		}.bind(this),false);
+
+		buttons[i].addEventListener("mouseleave",function(e){
+			this.minusUp(e);
+		}.bind(this),false);
 	}
 }
 
@@ -71,11 +90,41 @@ kitBuilder.prototype.initWindowListener = function(){
 		this.windowResized(e);
 	}.bind(this),false);
 }
+//use these to add button press effect
+kitBuilder.prototype.plusDown = function(event){
+	var plusButton = event.currentTarget;
+	plusButton.style.position = "relative";
+	plusButton.style.left = "3px";
+	plusButton.style.top = "3px";
+}
 
+kitBuilder.prototype.plusUp = function(event){
+	var plusButton = event.currentTarget;
+	plusButton.style.position = "initial";
+}
+
+kitBuilder.prototype.plusLeave = function(event){
+	var plusButton = event.currentTarget;
+	plusButton.style.position = "initial";
+}
+
+kitBuilder.prototype.minusDown = function(event){
+	var minusButton = event.currentTarget;
+	minusButton.style.position = "relative";
+	minusButton.style.left = "3px";
+	minusButton.style.top = "3px";
+}
+
+kitBuilder.prototype.minusUp = function(event){
+	var minusButton = event.currentTarget;
+	minusButton.style.position = "initial";
+}
+
+//handle quantity buttons clicked
 kitBuilder.prototype.plusClicked = function(event){
-	console.log("plus clicked ", event.target);
+	console.log("plus clicked ", event.currentTarget);
 	var valueLabel = parseInt(event.currentTarget.previousElementSibling.textContent);
-	console.log(valueLabel);
+	//console.log(valueLabel);
 	valueLabel++;
 	event.currentTarget.previousElementSibling.textContent = valueLabel.toString();
 }
@@ -83,7 +132,7 @@ kitBuilder.prototype.plusClicked = function(event){
 kitBuilder.prototype.minusClicked = function(event){
 	console.log("minus clicked ", event.target);
 	var valueLabel = parseInt(event.currentTarget.nextElementSibling.textContent);
-	console.log(valueLabel);
+	//console.log(valueLabel);
 	if(valueLabel === 0){
 		return;
 	}
@@ -94,10 +143,6 @@ kitBuilder.prototype.minusClicked = function(event){
 }
 
 kitBuilder.prototype.windowResized = function(event){
-	//console.log("size changed",event);
-	//console.log("offset height 1: ", document.getElementById("bundle-selector-content-1").scrollHeight);
-	//console.log("offset height 2: ", document.getElementById("bundle-selector-content-2").scrollHeight);
-	//console.log("offset height 3: ", document.getElementById("bundle-selector-content-3").scrollHeight);
 
 	//set heights to auto that are open
 	for(var i =0; i < this.bundleContentElements.length;i++){
