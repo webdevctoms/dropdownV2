@@ -1,7 +1,7 @@
 body {
   margin: 0;
 }
-/*container styles*/
+/*container styles doesn't really do much except for the relative positioning allows the image icon to use the container for positioning,since the image is absolute*/
 .bundle-container{
 	position: relative;
 	width: 50%;
@@ -20,12 +20,11 @@ body {
 .bundle-button:hover{
 	cursor: pointer;
 }
-/*icon styles*/
+/*icon styles absolute positioning used to position it to the far right og container*/
 .arrowIcon{
 	display: inline-block;
 	width: 15px;
 	height: 18px;
-	content: "";
 	transform: rotate(0deg);
 	transition: 500ms;
 	-webkit-transition: 500ms;
@@ -34,7 +33,7 @@ body {
 	position: absolute;
 	right: 0px;
 }
-/*selector styles*/
+/*selector styles these style the dropdown portion of the content*/
 
 .bundle-selector-content{
 	transition: height 1s;
@@ -45,17 +44,17 @@ body {
 	margin-top: 10px;
 	/*height: 0px;*/
 }
-
+/*title of the component*/
 .componentLabel{
 	max-width: 105px;
 }
-
+/*counter for components*/
 .numberCounter{
 	margin-left: 5px;
 	margin-right: 5px;
 	max-width: 8px;
 }
-
+/*set size of plus/minus icons*/
 .controlIcon{
 	height: 15px;
 	width: 12px;
@@ -68,12 +67,12 @@ body {
 .price{
 	font-size: 15px;
 }
-
+/*need this to hide/display prices depending on screen size*/
 .priceColumn{
 	text-align: center;
 	display: none;
 }
-
+/*style the kit tables*/
 .kitTable > tbody > tr >td{
 	width: 25%;
 }
@@ -91,17 +90,11 @@ body {
 	margin-bottom: 8px;
 	margin-top: 8px;
 }
-/*
-.plusIcon:hover{
-	position: relative;
-	left:3px;
-	top:3px;
-}
-*/
+
 .imageColumn{
 	display: none;
 }
-
+/*media queries for different size devices*/
 @media (min-width: 321px){
 	.componentLabel{
 		max-width: 120px;

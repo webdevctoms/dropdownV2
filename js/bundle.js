@@ -1,3 +1,9 @@
+/*
+initialize the kitbuilder class
+takes in string arguments of ids/classes to target with this functionality
+all the properties are set here and methods are defined below it
+button initializers are used to add event listeners to the buttons
+*/
 function kitBuilder(containerID,buttonIDs,bundleSelectorClass,plusClass,minusClass){
 	this.kitContainer = document.getElementById(containerID);
 	this.bundleButtons = this.getButtons(buttonIDs);
@@ -8,13 +14,12 @@ function kitBuilder(containerID,buttonIDs,bundleSelectorClass,plusClass,minusCla
 	for(var i = 0;i < this.bundleButtons.length;i++){
 		this.initButtons(this.bundleButtons[i]);
 	}
-	//this.bundleButtons.forEach(button => this.initButtons(button));
 	this.bundleSelectorClass = bundleSelectorClass;
 	this.initPlusButtons(this.plusButtons);
 	this.initMinusButtons(this.minusButtons);
 	this.initWindowListener();
 }
-
+//used to get the heights of the dropdown sections then set the heights to zero if none of them are open, parameter is required becuase this method is reused to recalculate heights when window size is changed, use the scroll height because content is being cut off and hidden
 kitBuilder.prototype.getHeights = function(isOpen){
 	if(isOpen === undefined){
 		isOpen = false;
@@ -29,7 +34,7 @@ kitBuilder.prototype.getHeights = function(isOpen){
 
 	return heights;
 }
-
+//this method grabs the buttons from the site using the button id passed in the initializer
 kitBuilder.prototype.getButtons = function(buttonIDs) {
 	var buttonArr = [];
 	for(var i = 0;i < buttonIDs.length;i++){
@@ -38,7 +43,7 @@ kitBuilder.prototype.getButtons = function(buttonIDs) {
 
 	return buttonArr;
 }
-
+//this method adds the event listeners to the plus buttons
 kitBuilder.prototype.initPlusButtons = function(buttons){
 	for(var i =0;i < buttons.length; i++){
 		buttons[i].addEventListener("click",function(e){
@@ -66,7 +71,7 @@ kitBuilder.prototype.initPlusButtons = function(buttons){
 		}.bind(this),false);
 	}
 }
-
+//this method adds the event listeners to the minus buttons
 kitBuilder.prototype.initMinusButtons = function(buttons){
 	for(var i =0;i < buttons.length; i++){
 		buttons[i].addEventListener("click",function(e){
@@ -94,19 +99,19 @@ kitBuilder.prototype.initMinusButtons = function(buttons){
 		}.bind(this),false);
 	}
 }
-
+//add event listeners to the dropdown buttons
 kitBuilder.prototype.initButtons = function(button){
 	button.addEventListener("click",function(e){
 		this.buttonClicked(e);
 	}.bind(this),false);
 }
-
+//add resize event
 kitBuilder.prototype.initWindowListener = function(){
 	window.addEventListener('resize',function(e){
 		this.windowResized(e);
 	}.bind(this),false);
 }
-//use these to add button press effect
+//use these methods to add button press effect
 kitBuilder.prototype.plusDown = function(event){
 	var plusButton = event.currentTarget;
 	plusButton.style.position = "relative";
@@ -136,7 +141,7 @@ kitBuilder.prototype.minusUp = function(event){
 	minusButton.style.position = "initial";
 }
 
-//handle quantity buttons clicked
+//handle plus button click events and increment counter
 kitBuilder.prototype.plusClicked = function(event){
 	console.log("plus clicked ", event.currentTarget);
 	var valueLabel = parseInt(event.currentTarget.previousElementSibling.textContent);
@@ -144,7 +149,7 @@ kitBuilder.prototype.plusClicked = function(event){
 	valueLabel++;
 	event.currentTarget.previousElementSibling.textContent = valueLabel.toString();
 }
-
+//handle minus button click events and decrement counter
 kitBuilder.prototype.minusClicked = function(event){
 	console.log("minus clicked ", event.target);
 	var valueLabel = parseInt(event.currentTarget.nextElementSibling.textContent);
@@ -157,7 +162,7 @@ kitBuilder.prototype.minusClicked = function(event){
 		event.currentTarget.nextElementSibling.textContent = valueLabel.toString();
 	}
 }
-
+//handle resize event by setting height of open dropdowns to auto so that content is not cut off,then recaclulate the heights of the dropdowns then assign the auto height as the current height, need to do this to keep the closing animation effect
 kitBuilder.prototype.windowResized = function(event){
 
 	//set heights to auto that are open
@@ -179,12 +184,10 @@ kitBuilder.prototype.windowResized = function(event){
 	}
 	
 }
-
+//this method handles when a dropdown button is clicked changes the height of the dropdown content and the rotation angle of the of the arrow for the animation effects also removes the bottom border after a 450ms
 kitBuilder.prototype.buttonClicked = function(event){
-	event.stopPropagation();
+	//event.stopPropagation();
 	event.preventDefault();
-	//console.log("clicked", event.currentTarget);
-	//console.log("next sibling", event.currentTarget.nextElementSibling);
 	var optionContent = event.currentTarget.nextElementSibling;
 	console.log("button ", optionContent);
 	var arrowIcon = event.currentTarget.children[1];
@@ -205,16 +208,9 @@ kitBuilder.prototype.buttonClicked = function(event){
 	}	
 	
 }
-/*
-document.addEventListener( "DOMContentLoaded", function() {
-	var kit1 = new kitBuilder("bundle-container1",["bundle-button1","bundle-button2","bundle-button3"],"bundle-selector-content","plusIcon","minusIcon");
-});
-*/
 
 function initKit(){
 	var kit1 = new kitBuilder("bundle-container1",["bundle-button1","bundle-button2","bundle-button3"],"bundle-selector-content","plusIcon","minusIcon");
 }
 
 window.onload = initKit;
-
-//$(initKit);
