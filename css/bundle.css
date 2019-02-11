@@ -45,13 +45,6 @@ body {
 	/*height: 0px;*/
 }
 
-.componenContainer{
-	/*
-	display: flex;
-	justify-content: space-between;
-	*/
-}
-
 .componentLabel{
 	max-width: 105px;
 }
@@ -84,12 +77,18 @@ body {
 	width: 25%;
 }
 
+.kitTable > tbody > tr{
+	border-bottom: 1px solid #ddd;
+}
+
 .quantityContainer{
 	float: right;
 }
 
 .componentImage{
 	width: 100%;
+	margin-bottom: 8px;
+	margin-top: 8px;
 }
 
 .imageColumn{
