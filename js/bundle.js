@@ -15,7 +15,8 @@ function kitBuilder(containerID,buttonIDs,bundleSelectorClass,plusClass,minusCla
 	this.initWindowListener();
 }
 
-kitBuilder.prototype.getHeights = function(isOpen = false){
+kitBuilder.prototype.getHeights = function(isOpen){
+
 	var heights = [];
 	for(var i = 0;i < this.bundleContentElements.length;i++){
 		heights.push(this.bundleContentElements[i].scrollHeight);
