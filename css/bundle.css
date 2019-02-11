@@ -111,6 +111,10 @@ body {
 		height: 16px;
 		width: 13px;
 	}
+	
+}
+
+@media (min-width: 600px){
 
 	.priceColumn{
 		display: table-cell;
