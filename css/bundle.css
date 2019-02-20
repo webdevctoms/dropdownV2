@@ -69,7 +69,7 @@ body {
 }
 /*need this to hide/display prices depending on screen size*/
 .priceColumn{
-	text-align: center;
+	text-align: right;
 	display: none;
 }
 /*style the kit tables*/
@@ -92,6 +92,10 @@ body {
 }
 
 .imageColumn{
+	text-align: center;
+	
+}
+.titleColumn{
 	display: none;
 }
 /*media queries for different size devices*/
@@ -152,8 +156,16 @@ body {
 		/*height: 0px;*/
 	}
 
-	.imageColumn{
+	.imageLabel{
+		display: none;
+	}
+
+	.titleColumn{
 		display: table-cell;
+	}
+
+	.priceColumn{
+		text-align: center;
 	}
 
 	.componentLabel{
