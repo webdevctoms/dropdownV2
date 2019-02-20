@@ -92,9 +92,9 @@ body {
 }
 
 .imageColumn{
-	text-align: center;
-	
+	text-align: center;	
 }
+
 .titleColumn{
 	display: none;
 }
@@ -166,6 +166,10 @@ body {
 
 	.priceColumn{
 		text-align: center;
+	}
+
+	.imageColumn{
+		text-align: initial;	
 	}
 
 	.componentLabel{
