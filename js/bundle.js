@@ -4,19 +4,17 @@ takes in string arguments of ids/classes to target with this functionality
 all the properties are set here and methods are defined below it
 button initializers are used to add event listeners to the buttons
 */
-function kitBuilder(containerID,buttonIDs,bundleSelectorClass,plusClass,minusClass){
+function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass){
 	this.kitContainer = document.getElementById(containerID);
-	this.bundleButtons = this.getButtons(buttonIDs);
+	this.bundleButtons = document.getElementsByClassName(buttonClass);
 	this.plusButtons = document.getElementsByClassName(plusClass);
 	this.minusButtons = document.getElementsByClassName(minusClass);
 	this.bundleContentElements = document.getElementsByClassName(bundleSelectorClass);
 	this.bundleHeights = this.getHeights();
-	for(var i = 0;i < this.bundleButtons.length;i++){
-		this.initButtons(this.bundleButtons[i]);
-	}
 	this.bundleSelectorClass = bundleSelectorClass;
 	this.initPlusButtons(this.plusButtons);
 	this.initMinusButtons(this.minusButtons);
+	this.initButtons(this.bundleButtons);
 	this.initWindowListener();
 }
 //used to get the heights of the dropdown sections then set the heights to zero if none of them are open, parameter is required becuase this method is reused to recalculate heights when window size is changed, use the scroll height because content is being cut off and hidden
@@ -100,10 +98,12 @@ kitBuilder.prototype.initMinusButtons = function(buttons){
 	}
 }
 //add event listeners to the dropdown buttons
-kitBuilder.prototype.initButtons = function(button){
-	button.addEventListener("click",function(e){
-		this.buttonClicked(e);
-	}.bind(this),false);
+kitBuilder.prototype.initButtons = function(buttons){
+	for(var i = 0;i < buttons.length;i++){
+		buttons[i].addEventListener("click",function(e){
+			this.buttonClicked(e);
+		}.bind(this),false);
+	}
 }
 //add resize event
 kitBuilder.prototype.initWindowListener = function(){
@@ -210,7 +210,7 @@ kitBuilder.prototype.buttonClicked = function(event){
 }
 
 function initKit(){
-	var kit1 = new kitBuilder("bundle-container1",["bundle-button1","bundle-button2","bundle-button3"],"bundle-selector-content","plusIcon","minusIcon");
+	var kit1 = new kitBuilder("bundle-container1","bundle-button","bundle-selector-content","plusIcon","minusIcon");
 }
 
 window.onload = initKit;

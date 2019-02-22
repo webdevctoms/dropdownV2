@@ -81,8 +81,8 @@ body {
 	border-bottom: 1px solid #ddd;
 }
 
-.quantityContainer{
-	float: right;
+.quantityColumn{
+	text-align: center;
 }
 
 .componentImage{
@@ -124,6 +124,9 @@ body {
 		display: table-cell;
 	}
 	
+	.quantityContainer{
+		float: right;
+	}
 }
 
 
