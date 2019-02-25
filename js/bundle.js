@@ -4,17 +4,21 @@ takes in string arguments of ids/classes to target with this functionality
 all the properties are set here and methods are defined below it
 button initializers are used to add event listeners to the buttons
 */
-function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass){
+function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,variantClass,productInputClass){
 	this.kitContainer = document.getElementById(containerID);
 	this.bundleButtons = document.getElementsByClassName(buttonClass);
 	this.plusButtons = document.getElementsByClassName(plusClass);
 	this.minusButtons = document.getElementsByClassName(minusClass);
+	this.variantSelects = document.getElementsByClassName(variantClass);
 	this.bundleContentElements = document.getElementsByClassName(bundleSelectorClass);
+	this.productInputs = document.getElementsByClassName(productInputClass);
 	this.bundleHeights = this.getHeights();
 	this.bundleSelectorClass = bundleSelectorClass;
 	this.initPlusButtons(this.plusButtons);
 	this.initMinusButtons(this.minusButtons);
 	this.initButtons(this.bundleButtons);
+	console.log(this.variantSelects);
+	this.initSelects(this.variantSelects);
 	this.initWindowListener();
 }
 //used to get the heights of the dropdown sections then set the heights to zero if none of them are open, parameter is required becuase this method is reused to recalculate heights when window size is changed, use the scroll height because content is being cut off and hidden
@@ -97,6 +101,13 @@ kitBuilder.prototype.initMinusButtons = function(buttons){
 		}.bind(this),false);
 	}
 }
+kitBuilder.prototype.initSelects = function(selects){
+	for(var i = 0;i < selects.length;i++){
+		selects[i].addEventListener("click",function(e){
+			this.selectChanged(e);
+		}.bind(this),false);
+	}
+}
 //add event listeners to the dropdown buttons
 kitBuilder.prototype.initButtons = function(buttons){
 	for(var i = 0;i < buttons.length;i++){
@@ -110,6 +121,14 @@ kitBuilder.prototype.initWindowListener = function(){
 	window.addEventListener('resize',function(e){
 		this.windowResized(e);
 	}.bind(this),false);
+}
+
+kitBuilder.prototype.selectChanged = function(event){
+	console.log("select changed: ",event.currentTarget.options[event.currentTarget.selectedIndex].value);
+	var selectID = event.currentTarget.dataset.selectid;
+	console.log(this.productInputs[selectID].attributes.variant_id);
+	this.productInputs[selectID].attributes.variant_id.value = event.currentTarget.options[event.currentTarget.selectedIndex].attributes.variant_id.value;
+
 }
 //use these methods to add button press effect
 kitBuilder.prototype.plusDown = function(event){
@@ -210,7 +229,7 @@ kitBuilder.prototype.buttonClicked = function(event){
 }
 
 function initKit(){
-	var kit1 = new kitBuilder("bundle-container1","bundle-button","bundle-selector-content","plusIcon","minusIcon");
+	var kit1 = new kitBuilder("bundle-container1","bundle-button","bundle-selector-content","plusIcon","minusIcon","variantSelect","product_placeholder");
 }
 
 window.onload = initKit;

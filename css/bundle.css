@@ -127,6 +127,10 @@ body {
 	.quantityContainer{
 		float: right;
 	}
+
+	.variantSelect{
+		float: right;
+	}
 }
 
 
