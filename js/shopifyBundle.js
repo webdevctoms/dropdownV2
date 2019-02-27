@@ -4,20 +4,32 @@ takes in string arguments of ids/classes to target with this functionality
 all the properties are set here and methods are defined below it
 button initializers are used to add event listeners to the buttons
 */
-function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass){
+function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,priceClass){
 	this.kitContainer = document.getElementById(containerID);
 	this.bundleButtons = document.getElementsByClassName(buttonClass);
 	this.plusButtons = document.getElementsByClassName(plusClass);
 	this.minusButtons = document.getElementsByClassName(minusClass);
+  	this.quantities = document.getElementsByClassName(quantityClass);
 	this.bundleContentElements = document.getElementsByClassName(bundleSelectorClass);
+  	this.variantSelects = document.getElementsByClassName(variantClass);
+  	this.productInputs = document.getElementsByClassName(productInputClass);
+  	//0 is for small screen price label and 1 is for large screen price label
+  	this.priceLabels = document.getElementsByClassName(priceLabelClass);
+  	this.prices = document.getElementsByClassName(priceClass);
+  	this.basePrice = parseFloat(this.priceLabels[0].innerText.replace("$",""));
 	this.bundleHeights = this.getHeights();
 	this.bundleSelectorClass = bundleSelectorClass;
 	this.initPlusButtons(this.plusButtons);
 	this.initMinusButtons(this.minusButtons);
 	this.initButtons(this.bundleButtons);
+  	this.initSelects(this.variantSelects);
 	this.initWindowListener();
+  	this.setPriceLabel(this.priceLabels,this.initPriceLabel(this.prices,this.quantities),this.basePrice);
+  
+  
 }
-//used to get the heights of the dropdown sections then set the heights to zero if none of them are open, parameter is required becuase this method is reused to recalculate heights when window size is changed, use the scroll height because content is being cut off and hidden
+//used to get the heights of the dropdown sections then set the heights to zero if none of them are open, parameter is required becuase this method is reused to recalculate heights when window size is changed, 
+//use the scroll height because content is being cut off and hidden
 kitBuilder.prototype.getHeights = function(isOpen){
 	if(isOpen === undefined){
 		isOpen = false;
@@ -32,15 +44,7 @@ kitBuilder.prototype.getHeights = function(isOpen){
 
 	return heights;
 }
-//this method grabs the buttons from the site using the button id passed in the initializer
-kitBuilder.prototype.getButtons = function(buttonIDs) {
-	var buttonArr = [];
-	for(var i = 0;i < buttonIDs.length;i++){
-		buttonArr.push(document.getElementById(buttonIDs[i]));
-	}
 
-	return buttonArr;
-}
 //this method adds the event listeners to the plus buttons
 kitBuilder.prototype.initPlusButtons = function(buttons){
 	for(var i =0;i < buttons.length; i++){
@@ -97,6 +101,66 @@ kitBuilder.prototype.initMinusButtons = function(buttons){
 		}.bind(this),false);
 	}
 }
+
+kitBuilder.prototype.initSelects = function(selects){
+	for(var i = 0;i < selects.length;i++){
+		selects[i].addEventListener("click",function(e){
+			this.selectChanged(e);
+		}.bind(this),false);
+	}
+}
+
+kitBuilder.prototype.setPriceLabel = function(priceLabels,newPrice,basePrice,subtract){
+  if(subtract === undefined){
+    subtract = false;
+  }
+
+  for(var i = 0;i < priceLabels.length;i++){
+    if(newPrice % 1 === 0 && !subtract){
+       priceLabels[i].innerText = "$" + (newPrice + basePrice) + ".00";
+       
+    }
+    else if(newPrice % 1 !== 0 && !subtract){
+      
+      newPrice = Math.round(newPrice * 100) / 100;
+      priceLabels[i].innerText = "$" + (newPrice + basePrice) + ".00";     
+      
+    }
+    else if(newPrice % 1 === 0 && subtract){
+       priceLabels[i].innerText = "$" + (basePrice - newPrice) + ".00";
+       
+    }
+    else if(newPrice % 1 !== 0 && subtract){
+      
+      newPrice = Math.round(newPrice * 100) / 100;
+      priceLabels[i].innerText = "$" + (basePrice - newPrice) + ".00";     
+      
+    }
+    
+  }
+  if(!subtract){
+    this.basePrice += newPrice;
+  }
+  else{
+    this.basePrice -= newPrice;
+  }
+  
+  
+}
+
+kitBuilder.prototype.initPriceLabel = function(prices,quantities){
+  var newPrice = 0;
+  for(var i =0;i < prices.length;i++){
+    if(quantities[i].value !== "0"){
+      var productPrice = parseFloat(prices[i].innerText.replace("$",""));
+      newPrice += productPrice;
+    }
+  }
+  //console.log("newPrice",newPrice);
+  return newPrice;
+  
+}
+
 //add event listeners to the dropdown buttons
 kitBuilder.prototype.initButtons = function(buttons){
 	for(var i = 0;i < buttons.length;i++){
@@ -110,6 +174,12 @@ kitBuilder.prototype.initWindowListener = function(){
 	window.addEventListener('resize',function(e){
 		this.windowResized(e);
 	}.bind(this),false);
+}
+
+kitBuilder.prototype.selectChanged = function(event){
+	var selectID = event.currentTarget.dataset.selectid;
+	this.productInputs[selectID].attributes.variant_id.value = event.currentTarget.options[event.currentTarget.selectedIndex].attributes.variant_id.value;
+
 }
 //use these methods to add button press effect
 kitBuilder.prototype.plusDown = function(event){
@@ -143,18 +213,20 @@ kitBuilder.prototype.minusUp = function(event){
 
 //handle plus button click events and increment counter
 kitBuilder.prototype.plusClicked = function(event){
-	console.log("plus clicked ", event.currentTarget);
+	//console.log("plus clicked ", event.currentTarget);
 	var valueLabel = parseInt(event.currentTarget.previousElementSibling.textContent);
 	//console.log(valueLabel);
 	valueLabel++;
  	var plusID = event.currentTarget.dataset.plusid;
-  	var inputQuantity = document.getElementsByClassName("kit_quantity")[plusID];
+  	var inputQuantity = this.quantities[plusID];
+  	var price = parseFloat(this.prices[plusID].innerText.replace("$",""));
+  	this.setPriceLabel(this.priceLabels,price,this.basePrice);  	 
   	inputQuantity.value = valueLabel.toString();
 	event.currentTarget.previousElementSibling.textContent = valueLabel.toString();
 }
 //handle minus button click events and decrement counter
 kitBuilder.prototype.minusClicked = function(event){
-	console.log("minus clicked ", event.target);
+	//console.log("minus clicked ", event.target);
 	var valueLabel = parseInt(event.currentTarget.nextElementSibling.textContent);
 	//console.log(valueLabel);
 	if(valueLabel === 0){
@@ -163,19 +235,22 @@ kitBuilder.prototype.minusClicked = function(event){
 	else{
 		valueLabel--;
         var minusID = event.currentTarget.dataset.minusid;
-      	var inputQuantity = document.getElementsByClassName("kit_quantity")[minusID];
+      	var inputQuantity = this.quantities[minusID];
       	inputQuantity.value = valueLabel.toString();
+        var price = parseFloat(this.prices[minusID].innerText.replace("$",""));
+     	this.setPriceLabel(this.priceLabels,price,this.basePrice,true); 
 		event.currentTarget.nextElementSibling.textContent = valueLabel.toString();
 	}
 }
-//handle resize event by setting height of open dropdowns to auto so that content is not cut off,then recaclulate the heights of the dropdowns then assign the auto height as the current height, need to do this to keep the closing animation effect
+//handle resize event by setting height of open dropdowns to auto so that content is not cut off,then recaclulate the heights of the dropdowns then assign 
+//the auto height as the current height, need to do this to keep the closing animation effect
 kitBuilder.prototype.windowResized = function(event){
 
 	//set heights to auto that are open
 	for(var i =0; i < this.bundleContentElements.length;i++){
 		
 		if(this.bundleContentElements[i].style.height !== "0px"){
-			console.log("first loop ",this.bundleContentElements[i].style.height);
+			//console.log("first loop ",this.bundleContentElements[i].style.height);
 			this.bundleContentElements[i].style.height = "auto";
 		}
 	}
@@ -184,24 +259,25 @@ kitBuilder.prototype.windowResized = function(event){
 	for(var i =0; i < this.bundleContentElements.length;i++){
 		
 		if(this.bundleContentElements[i].style.height !== "0px"){
-			console.log(this.bundleContentElements[i].scrollHeight);
+			//console.log(this.bundleContentElements[i].scrollHeight);
 			this.bundleContentElements[i].style.height = this.bundleContentElements[i].scrollHeight + "px";
 		}
 	}
 	
 }
-//this method handles when a dropdown button is clicked changes the height of the dropdown content and the rotation angle of the of the arrow for the animation effects also removes the bottom border after a 450ms
+//this method handles when a dropdown button is clicked changes the height of the dropdown content and the rotation angle 
+//of the of the arrow for the animation effects also removes the bottom border after a 450ms
 kitBuilder.prototype.buttonClicked = function(event){
 	//event.stopPropagation();
 	event.preventDefault();
 	var optionContent = event.currentTarget.nextElementSibling;
-	console.log("button ", optionContent);
+	//console.log("button ", optionContent);
 	var arrowIcon = event.currentTarget.children[1];
 
 	if(optionContent.style.height === "0px"){
 		arrowIcon.style.transform = "rotate(180deg)";
 		var bundleId = event.currentTarget.dataset.bundleid;
-		console.log(this.bundleHeights, bundleId);
+		//console.log(this.bundleHeights, bundleId);
 		optionContent.style.height = this.bundleHeights[bundleId] + "px";
 		optionContent.style.borderBottom = "1px solid #ddd";
 	}
@@ -216,5 +292,6 @@ kitBuilder.prototype.buttonClicked = function(event){
 }
 
 function initKit(){
-	var kit1 = new kitBuilder("bundle-container1","bundle-button","bundle-selector-content","plusIcon","minusIcon");
+	var kit1 = new kitBuilder("bundle-container1","bundle-button","bundle-selector-content","plusIcon","minusIcon","kit_quantity","variantSelect","product_placeholder","product__price","price");
 }
+

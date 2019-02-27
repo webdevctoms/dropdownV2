@@ -36,15 +36,7 @@ kitBuilder.prototype.getHeights = function(isOpen){
 
 	return heights;
 }
-//this method grabs the buttons from the site using the button id passed in the initializer
-kitBuilder.prototype.getButtons = function(buttonIDs) {
-	var buttonArr = [];
-	for(var i = 0;i < buttonIDs.length;i++){
-		buttonArr.push(document.getElementById(buttonIDs[i]));
-	}
 
-	return buttonArr;
-}
 //this method adds the event listeners to the plus buttons
 kitBuilder.prototype.initPlusButtons = function(buttons){
 	for(var i =0;i < buttons.length; i++){
@@ -126,6 +118,7 @@ kitBuilder.prototype.initWindowListener = function(){
 kitBuilder.prototype.selectChanged = function(event){
 	console.log("select changed: ",event.currentTarget.options[event.currentTarget.selectedIndex].value);
 	var selectID = event.currentTarget.dataset.selectid;
+	console.log(event.currentTarget);
 	console.log(this.productInputs[selectID].attributes.variant_id);
 	this.productInputs[selectID].attributes.variant_id.value = event.currentTarget.options[event.currentTarget.selectedIndex].attributes.variant_id.value;
 
