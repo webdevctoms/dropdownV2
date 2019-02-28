@@ -17,7 +17,7 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
 	this.initPlusButtons(this.plusButtons);
 	this.initMinusButtons(this.minusButtons);
 	this.initButtons(this.bundleButtons);
-	console.log(this.variantSelects);
+	//console.log(this.variantSelects);
 	this.initSelects(this.variantSelects);
 	this.initWindowListener();
 }

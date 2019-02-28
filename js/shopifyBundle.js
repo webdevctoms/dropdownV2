@@ -13,18 +13,20 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
 	this.bundleContentElements = document.getElementsByClassName(bundleSelectorClass);
   	this.variantSelects = document.getElementsByClassName(variantClass);
   	this.productInputs = document.getElementsByClassName(productInputClass);
+  	this.priceLabelClass = priceLabelClass;
   	//0 is for small screen price label and 1 is for large screen price label
   	this.priceLabels = document.getElementsByClassName(priceLabelClass);
   	this.prices = document.getElementsByClassName(priceClass);
   	this.basePrice = parseFloat(this.priceLabels[0].innerText.replace("$",""));
 	this.bundleHeights = this.getHeights();
 	this.bundleSelectorClass = bundleSelectorClass;
+  
 	this.initPlusButtons(this.plusButtons);
 	this.initMinusButtons(this.minusButtons);
 	this.initButtons(this.bundleButtons);
   	this.initSelects(this.variantSelects);
 	this.initWindowListener();
-  	this.setPriceLabel(this.priceLabels,this.initPriceLabel(this.prices,this.quantities),this.basePrice);
+  	this.setPriceLabel(this.priceLabels,this.initPriceLabel(this.prices,this.quantities),0);
   
   
 }
@@ -110,6 +112,12 @@ kitBuilder.prototype.initSelects = function(selects){
 	}
 }
 
+kitBuilder.prototype.getLabelPrice = function(){
+  var priceLabels = document.getElementsByClassName(this.priceLabelClass);
+  var labelPrice = parseFloat(this.priceLabels[0].innerText.replace("$",""));
+  return labelPrice;
+}
+
 kitBuilder.prototype.setPriceLabel = function(priceLabels,newPrice,basePrice,subtract){
   if(subtract === undefined){
     subtract = false;
@@ -138,21 +146,14 @@ kitBuilder.prototype.setPriceLabel = function(priceLabels,newPrice,basePrice,sub
     }
     
   }
-  if(!subtract){
-    this.basePrice += newPrice;
-  }
-  else{
-    this.basePrice -= newPrice;
-  }
-  
-  
+
 }
 
 kitBuilder.prototype.initPriceLabel = function(prices,quantities){
   var newPrice = 0;
   for(var i =0;i < prices.length;i++){
     if(quantities[i].value !== "0"){
-      var productPrice = parseFloat(prices[i].innerText.replace("$",""));
+      var productPrice = parseFloat(prices[i].innerText.replace("$","")) * parseInt(quantities[i].value);
       newPrice += productPrice;
     }
   }
@@ -220,7 +221,8 @@ kitBuilder.prototype.plusClicked = function(event){
  	var plusID = event.currentTarget.dataset.plusid;
   	var inputQuantity = this.quantities[plusID];
   	var price = parseFloat(this.prices[plusID].innerText.replace("$",""));
-  	this.setPriceLabel(this.priceLabels,price,this.basePrice);  	 
+  	var labelPrice = this.getLabelPrice();
+  	this.setPriceLabel(this.priceLabels,price,labelPrice);  	 
   	inputQuantity.value = valueLabel.toString();
 	event.currentTarget.previousElementSibling.textContent = valueLabel.toString();
 }
@@ -238,7 +240,8 @@ kitBuilder.prototype.minusClicked = function(event){
       	var inputQuantity = this.quantities[minusID];
       	inputQuantity.value = valueLabel.toString();
         var price = parseFloat(this.prices[minusID].innerText.replace("$",""));
-     	this.setPriceLabel(this.priceLabels,price,this.basePrice,true); 
+      	var labelPrice = this.getLabelPrice();
+     	this.setPriceLabel(this.priceLabels,price,labelPrice,true); 
 		event.currentTarget.nextElementSibling.textContent = valueLabel.toString();
 	}
 }
