@@ -4,7 +4,7 @@ takes in string arguments of ids/classes to target with this functionality
 all the properties are set here and methods are defined below it
 button initializers are used to add event listeners to the buttons
 */
-function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,priceClass){
+function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,priceClass,quantityID){
 	this.kitContainer = document.getElementById(containerID);
 	this.bundleButtons = document.getElementsByClassName(buttonClass);
 	this.plusButtons = document.getElementsByClassName(plusClass);
@@ -20,7 +20,8 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
   	this.basePrice = parseFloat(this.priceLabels[0].innerText.replace("$",""));
 	this.bundleHeights = this.getHeights();
 	this.bundleSelectorClass = bundleSelectorClass;
-  
+  	this.kitQuantity = document.getElementById(quantityID).value;
+    this.quantityID = quantityID;
 	this.initPlusButtons(this.plusButtons);
 	this.initMinusButtons(this.minusButtons);
 	this.initButtons(this.bundleButtons);
@@ -111,39 +112,40 @@ kitBuilder.prototype.initSelects = function(selects){
 		}.bind(this),false);
 	}
 }
-
+/*
 kitBuilder.prototype.getLabelPrice = function(){
   var priceLabels = document.getElementsByClassName(this.priceLabelClass);
   var labelPrice = parseFloat(this.priceLabels[0].innerText.replace("$",""));
   return labelPrice;
 }
+*/
+kitBuilder.prototype.updateKitPrice = function(kitQuantity){
 
-kitBuilder.prototype.setPriceLabel = function(priceLabels,newPrice,basePrice,subtract){
-  if(subtract === undefined){
-    subtract = false;
+  var totalPrice = 0;
+
+  for(var i = 0;i < this.quantities.length;i++){
+    var componentPrice = parseFloat(this.prices[i].innerText.replace("$","")) * parseInt(this.quantities[i].value);
+    totalPrice += componentPrice
+
   }
 
+  var finalPrice = totalPrice * kitQuantity;
+  //console.log(finalPrice,kitQuantity);
+  return finalPrice;
+
+}
+
+kitBuilder.prototype.setPriceLabel = function(priceLabels,newPrice){
+  
   for(var i = 0;i < priceLabels.length;i++){
-    if(newPrice % 1 === 0 && !subtract){
-       priceLabels[i].innerText = "$" + (newPrice + basePrice) + ".00";
+    if(newPrice % 1 === 0 ){
+       priceLabels[i].innerText = "$" + (newPrice) + ".00";
        
     }
-    else if(newPrice % 1 !== 0 && !subtract){
-      
-      newPrice = Math.round(newPrice * 100) / 100;
-      priceLabels[i].innerText = "$" + (newPrice + basePrice) + ".00";     
-      
+    else{
+      priceLabels[i].innerText = "$" + (newPrice);
     }
-    else if(newPrice % 1 === 0 && subtract){
-       priceLabels[i].innerText = "$" + (basePrice - newPrice) + ".00";
-       
-    }
-    else if(newPrice % 1 !== 0 && subtract){
-      
-      newPrice = Math.round(newPrice * 100) / 100;
-      priceLabels[i].innerText = "$" + (basePrice - newPrice) + ".00";     
-      
-    }
+
     
   }
 
@@ -180,7 +182,15 @@ kitBuilder.prototype.initWindowListener = function(){
 kitBuilder.prototype.selectChanged = function(event){
 	var selectID = event.currentTarget.dataset.selectid;
 	this.productInputs[selectID].attributes.variant_id.value = event.currentTarget.options[event.currentTarget.selectedIndex].attributes.variant_id.value;
-
+  	var oldPrice = this.prices[selectID].innerText;
+  	var newPrice = event.currentTarget.options[event.currentTarget.selectedIndex].attributes.variant_price.value;
+  	this.prices[selectID].innerText = event.currentTarget.options[event.currentTarget.selectedIndex].attributes.variant_price.value;
+    if(oldPrice !== newPrice){
+      var kitQuantity = document.getElementById(this.quantityID).value;
+      var finalPrice = this.updateKitPrice(kitQuantity);
+      this.setPriceLabel(this.priceLabels,finalPrice); 
+    }
+  	
 }
 //use these methods to add button press effect
 kitBuilder.prototype.plusDown = function(event){
@@ -221,10 +231,13 @@ kitBuilder.prototype.plusClicked = function(event){
  	var plusID = event.currentTarget.dataset.plusid;
   	var inputQuantity = this.quantities[plusID];
   	var price = parseFloat(this.prices[plusID].innerText.replace("$",""));
-  	var labelPrice = this.getLabelPrice();
-  	this.setPriceLabel(this.priceLabels,price,labelPrice);  	 
+  	//var labelPrice = this.getLabelPrice();	 
   	inputQuantity.value = valueLabel.toString();
 	event.currentTarget.previousElementSibling.textContent = valueLabel.toString();
+  	
+  	var kitQuantity = document.getElementById(this.quantityID).value;
+ 	var finalPrice = this.updateKitPrice(kitQuantity);
+  	this.setPriceLabel(this.priceLabels,finalPrice);  
 }
 //handle minus button click events and decrement counter
 kitBuilder.prototype.minusClicked = function(event){
@@ -240,9 +253,12 @@ kitBuilder.prototype.minusClicked = function(event){
       	var inputQuantity = this.quantities[minusID];
       	inputQuantity.value = valueLabel.toString();
         var price = parseFloat(this.prices[minusID].innerText.replace("$",""));
-      	var labelPrice = this.getLabelPrice();
-     	this.setPriceLabel(this.priceLabels,price,labelPrice,true); 
+      	//var labelPrice = this.getLabelPrice();
 		event.currentTarget.nextElementSibling.textContent = valueLabel.toString();
+      	
+      	var kitQuantity = document.getElementById(this.quantityID).value;
+        var finalPrice = this.updateKitPrice(kitQuantity);
+     	this.setPriceLabel(this.priceLabels,finalPrice); 
 	}
 }
 //handle resize event by setting height of open dropdowns to auto so that content is not cut off,then recaclulate the heights of the dropdowns then assign 
@@ -295,6 +311,6 @@ kitBuilder.prototype.buttonClicked = function(event){
 }
 
 function initKit(){
-	var kit1 = new kitBuilder("bundle-container1","bundle-button","bundle-selector-content","plusIcon","minusIcon","kit_quantity","variantSelect","product_placeholder","product__price","price");
+	var kit1 = new kitBuilder("bundle-container1","bundle-button","bundle-selector-content","plusIcon","minusIcon","kit_quantity","variantSelect","product_placeholder","product__price","price","currentQuantity");
 }
 
