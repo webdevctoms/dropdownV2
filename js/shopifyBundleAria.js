@@ -4,7 +4,7 @@ takes in string arguments of ids/classes to target with this functionality
 all the properties are set here and methods are defined below it
 button initializers are used to add event listeners to the buttons
 */
-function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass){
+function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass){
 	this.kitContainer = document.getElementById(containerID);
 	this.bundleButtons = document.getElementsByClassName(buttonClass);
 	this.plusButtons = document.getElementsByClassName(plusClass);
@@ -22,7 +22,8 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
   	this.prices = document.getElementsByClassName(componentPriceLabelClass);
   	//console.log(this.prices);
   	//these are the price labels for each component only used for changing variant price
-  	this.componentPriceLabels = document.getElementsByClassName(priceClass);	
+  	this.componentPriceLabels = document.getElementsByClassName(priceClass);
+ 	this.baseKitClass = baseKitClass;
   	this.basePrice = parseFloat(this.priceLabels[0].innerText.replace("$",""));
  	this.setPriceLabel(this.priceLabels,this.initPriceLabel(this.prices,this.quantities));
 	this.bundleHeights = this.getHeights();
@@ -33,9 +34,7 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
 	this.initMinusButtons(this.minusButtons);
 	this.initButtons(this.bundleButtons);
   	this.initSelects(this.variantSelects);
-	this.initWindowListener();
-  	
-  
+	this.initWindowListener();  
   
 }
 //used to get the heights of the dropdown sections then set the heights to zero if none of them are open, parameter is required becuase this method is reused to recalculate heights when window size is changed, 
@@ -115,7 +114,7 @@ kitBuilder.prototype.initMinusButtons = function(buttons){
 
 kitBuilder.prototype.initSelects = function(selects){
 	for(var i = 0;i < selects.length;i++){
-		selects[i].addEventListener("click",function(e){
+		selects[i].addEventListener("change",function(e){
 			this.selectChanged(e);
 		}.bind(this),false);
 	}
@@ -240,8 +239,8 @@ kitBuilder.prototype.getQuantities = function(){
       prices:[]
     };
   	for(var i = 0;i < this.bundleContentElements.length;i++){
-      if(this.bundleContentElements[i].style.visibility !== "initial"){
-        this.bundleContentElements[i].style.visibility = "initial";
+      if(this.bundleContentElements[i].style.visibility !== "visible"){
+        this.bundleContentElements[i].style.visibility = "visible";
         closedBundles.push(i);
       }		
 	}
@@ -282,9 +281,11 @@ kitBuilder.prototype.plusClicked = function(event){
 //handle minus button click events and decrement counter
 kitBuilder.prototype.minusClicked = function(event){
   	event.preventDefault();
-	//console.log("minus clicked ", event.target);
 	var valueLabel = parseInt(event.currentTarget.nextElementSibling.textContent);
-	//console.log(valueLabel);
+  	var nextSibling = event.currentTarget.nextElementSibling
+    if(valueLabel === 1 && nextSibling.classList.contains(this.baseKitClass)){
+      	return;
+    }
 	if(valueLabel === 0){
 		return;
 	}
@@ -294,10 +295,8 @@ kitBuilder.prototype.minusClicked = function(event){
       	var inputQuantity = this.quantities[minusID];
       	inputQuantity.value = valueLabel.toString();
         var price = parseFloat(this.prices[minusID].innerText.replace("$",""));
-      	//var labelPrice = this.getLabelPrice();
 		event.currentTarget.nextElementSibling.textContent = valueLabel.toString();
       
-      	//var quantityValues = this.getQuantities();
       	var kitQuantity = document.getElementById(this.quantityID).value;
         var finalPrice = this.updateKitPrice(kitQuantity);
      	this.setPriceLabel(this.priceLabels,finalPrice); 
@@ -340,7 +339,7 @@ kitBuilder.prototype.buttonClicked = function(event){
 		arrowIcon.style.transform = "rotate(180deg)";
 		var bundleId = event.currentTarget.dataset.bundleid;
 		//console.log(this.bundleHeights, bundleId);
-      	optionContent.style.visibility="initial";
+      	optionContent.style.visibility="visible";
 		event.currentTarget.attributes["aria-expanded"].value = "true";
       	setTimeout(function(){
 			optionContent.style.height = this.bundleHeights[bundleId] + "px";
@@ -364,5 +363,5 @@ kitBuilder.prototype.buttonClicked = function(event){
 }
 
 function initKit(){
-	var kit1 = new kitBuilder("bundle-container1","bundle-button","bundle-selector-content","plusIcon","minusIcon","kit_quantity","variantSelect","product_placeholder","product__price","component_price","currentQuantity","price");
+	var kit1 = new kitBuilder("bundle-container1","bundle-button","bundle-selector-content","plusIcon","minusIcon","kit_quantity","variantSelect","product_placeholder","product__price","component_price","currentQuantity","price","baseKit");
 }

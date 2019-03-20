@@ -121,6 +121,7 @@ kitBuilder.prototype.selectChanged = function(event){
 	console.log(event.currentTarget);
 	console.log(this.productInputs[selectID].attributes.variant_id);
 	this.productInputs[selectID].attributes.variant_id.value = event.currentTarget.options[event.currentTarget.selectedIndex].attributes.variant_id.value;
+	//this.
 
 }
 //use these methods to add button press effect
