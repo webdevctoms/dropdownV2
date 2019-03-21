@@ -137,6 +137,7 @@ kitBuilder.prototype.updateKitPrice = function(kitQuantity){
   }
 
   var finalPrice = totalPrice * kitQuantity;
+  finalPrice = Math.round(finalPrice * 100) / 100
   console.log(finalPrice,kitQuantity);
   return finalPrice;
 
@@ -365,3 +366,4 @@ kitBuilder.prototype.buttonClicked = function(event){
 function initKit(){
 	var kit1 = new kitBuilder("bundle-container1","bundle-button","bundle-selector-content","plusIcon","minusIcon","kit_quantity","variantSelect","product_placeholder","product__price","component_price","currentQuantity","price","baseKit");
 }
+
