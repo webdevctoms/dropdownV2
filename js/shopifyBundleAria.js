@@ -53,7 +53,7 @@ kitBuilder.prototype.getHeights = function(isOpen){
 	}
 
 	return heights;
-}
+};
 
 //this method adds the event listeners to the plus buttons
 kitBuilder.prototype.initPlusButtons = function(buttons){
@@ -82,7 +82,7 @@ kitBuilder.prototype.initPlusButtons = function(buttons){
 			this.plusUp(e);
 		}.bind(this),false);
 	}
-}
+};
 //this method adds the event listeners to the minus buttons
 kitBuilder.prototype.initMinusButtons = function(buttons){
 	for(var i =0;i < buttons.length; i++){
@@ -110,7 +110,7 @@ kitBuilder.prototype.initMinusButtons = function(buttons){
 			this.minusUp(e);
 		}.bind(this),false);
 	}
-}
+};
 
 kitBuilder.prototype.initSelects = function(selects){
 	for(var i = 0;i < selects.length;i++){
@@ -118,7 +118,7 @@ kitBuilder.prototype.initSelects = function(selects){
 			this.selectChanged(e);
 		}.bind(this),false);
 	}
-}
+};
 /*
 kitBuilder.prototype.getLabelPrice = function(){
   var priceLabels = document.getElementsByClassName(this.priceLabelClass);
@@ -141,7 +141,7 @@ kitBuilder.prototype.updateKitPrice = function(kitQuantity){
   console.log(finalPrice,kitQuantity);
   return finalPrice;
 
-}
+};
 
 kitBuilder.prototype.setPriceLabel = function(priceLabels,newPrice){
   
@@ -157,7 +157,7 @@ kitBuilder.prototype.setPriceLabel = function(priceLabels,newPrice){
     
   }
 
-}
+};
 
 kitBuilder.prototype.initPriceLabel = function(prices,quantities){
   var newPrice = 0;
@@ -167,10 +167,10 @@ kitBuilder.prototype.initPriceLabel = function(prices,quantities){
       newPrice += productPrice;
     }
   }
-  //console.log("newPrice",newPrice);
+
   return newPrice;
   
-}
+};
 
 //add event listeners to the dropdown buttons
 kitBuilder.prototype.initButtons = function(buttons){
@@ -179,13 +179,13 @@ kitBuilder.prototype.initButtons = function(buttons){
 			this.buttonClicked(e);
 		}.bind(this),false);
 	}
-}
+};
 //add resize event
 kitBuilder.prototype.initWindowListener = function(){
 	window.addEventListener('resize',function(e){
 		this.windowResized(e);
 	}.bind(this),false);
-}
+};
 
 kitBuilder.prototype.selectChanged = function(event){
 	var selectID = event.currentTarget.dataset.selectid;
@@ -200,41 +200,40 @@ kitBuilder.prototype.selectChanged = function(event){
       this.setPriceLabel(this.priceLabels,finalPrice); 
     }
   	
-}
+};
 //use these methods to add button press effect
 kitBuilder.prototype.plusDown = function(event){
 	var plusButton = event.currentTarget;
 	plusButton.style.position = "relative";
 	plusButton.style.left = "3px";
 	plusButton.style.top = "3px";
-}
+};
 
 kitBuilder.prototype.plusUp = function(event){
 	var plusButton = event.currentTarget;
 	plusButton.style.position = "initial";
-}
+};
 
 kitBuilder.prototype.plusLeave = function(event){
 	var plusButton = event.currentTarget;
 	plusButton.style.position = "initial";
-}
+};
 
 kitBuilder.prototype.minusDown = function(event){
 	var minusButton = event.currentTarget;
 	minusButton.style.position = "relative";
 	minusButton.style.left = "3px";
 	minusButton.style.top = "3px";
-}
+};
 
 kitBuilder.prototype.minusUp = function(event){
 	var minusButton = event.currentTarget;
 	minusButton.style.position = "initial";
-}
+};
 
 kitBuilder.prototype.getQuantities = function(){
   	//use this to put closed bundles back to hidden
   	var closedBundles = [];
-    //var quantities = [];
   	var currentValues = {
       quantities:[],
       prices:[]
@@ -257,14 +256,13 @@ kitBuilder.prototype.getQuantities = function(){
     }
   
   return currentValues;
-}
+};
 
 //handle plus button click events and increment counter
 kitBuilder.prototype.plusClicked = function(event){
   	event.preventDefault();
-	//console.log("plus clicked ", event.currentTarget);
+
 	var valueLabel = parseInt(event.currentTarget.previousElementSibling.textContent);
-	//console.log(valueLabel);
 	valueLabel++;
  	var plusID = event.currentTarget.dataset.plusid;
   	var inputQuantity = this.quantities[plusID];
@@ -277,14 +275,16 @@ kitBuilder.prototype.plusClicked = function(event){
   	var kitQuantity = document.getElementById(this.quantityID).value;
  	var finalPrice = this.updateKitPrice(kitQuantity);
   	this.setPriceLabel(this.priceLabels,finalPrice);  
-}
+};
 
 //handle minus button click events and decrement counter
 kitBuilder.prototype.minusClicked = function(event){
   	event.preventDefault();
 	var valueLabel = parseInt(event.currentTarget.nextElementSibling.textContent);
   	var nextSibling = event.currentTarget.nextElementSibling
-    if(valueLabel === 1 && nextSibling.classList.contains(this.baseKitClass)){
+    var kitMin = parseInt(nextSibling.dataset.minimum);
+
+    if(valueLabel === kitMin && nextSibling.classList.contains(this.baseKitClass)){
       	return;
     }
 	if(valueLabel === 0){
@@ -302,7 +302,7 @@ kitBuilder.prototype.minusClicked = function(event){
         var finalPrice = this.updateKitPrice(kitQuantity);
      	this.setPriceLabel(this.priceLabels,finalPrice); 
 	}
-}
+};
 //handle resize event by setting height of open dropdowns to auto so that content is not cut off,then recaclulate the heights of the dropdowns then assign 
 //the auto height as the current height, need to do this to keep the closing animation effect
 kitBuilder.prototype.windowResized = function(event){
@@ -325,11 +325,11 @@ kitBuilder.prototype.windowResized = function(event){
 		}
 	}
 	
-}
+};
 //this method handles when a dropdown button is clicked changes the height of the dropdown content and the rotation angle 
 //of the of the arrow for the animation effects also removes the bottom border after a 450ms
 kitBuilder.prototype.buttonClicked = function(event){
-	//event.stopPropagation();
+
 	event.preventDefault();
 	var optionContent = event.currentTarget.nextElementSibling;
 	//console.log("button ", optionContent);
@@ -354,14 +354,13 @@ kitBuilder.prototype.buttonClicked = function(event){
 		setTimeout(function(){
 			optionContent.style.borderBottom = "none";
           	//optionContent.style.display="none";
-		},450);
+		},350);
       
-      setTimeout(function(){
-          	optionContent.style.visibility="hidden";
-		},550);
+		optionContent.style.visibility="hidden";
+
 	}	
 	
-}
+};
 
 function initKit(){
 	var kit1 = new kitBuilder("bundle-container1","bundle-button","bundle-selector-content","plusIcon","minusIcon","kit_quantity","variantSelect","product_placeholder","product__price","component_price","currentQuantity","price","baseKit");
