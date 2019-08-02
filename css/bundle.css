@@ -1,32 +1,21 @@
-body {
-  margin: 0;
-}
 /*container styles doesn't really do much except for the relative positioning allows the image icon to use the container for positioning,since the image is absolute*/
 .bundle-container{
 	position: relative;
-	width: 50%;
 	margin: auto;
 }
 /*button styles*/
 .bundle-button{
 	padding-bottom: 5px;
 	border-bottom: 1px solid #0c0c0d;
-	display: block;
-	text-decoration: none;
-	color: inherit;
+  	display: block;
 }
-
-.bundle-button:hover{
-	color: inherit;
-}
-
-.bundle-button:focus{
-	color: inherit;
-	text-decoration: none;
-}
-
+/*max width for smallest iphone*/
 .bundle-button p{
-	display: inline;
+	display: inline-block;
+  	word-break: break-word;
+  	text-transform:capitalize;
+  	margin-bottom:0;
+  	max-width:220px;
 }
 
 .bundle-button:hover{
@@ -35,8 +24,6 @@ body {
 /*icon styles absolute positioning used to position it to the far right og container*/
 .arrowIcon{
 	display: inline-block;
-	width: 15px;
-	height: 18px;
 	transform: rotate(0deg);
 	transition: 500ms;
 	-webkit-transition: 500ms;
@@ -70,6 +57,7 @@ body {
 .controlIcon{
 	height: 15px;
 	width: 12px;
+  	display:inline-block;
 }
 
 .controlIcon:hover{
@@ -79,12 +67,18 @@ body {
 .price{
 	font-size: 15px;
 }
+.variantSelect{
+	margin-top: 5px;
+}
 /*need this to hide/display prices depending on screen size*/
 .priceColumn{
 	text-align: right;
 	display: none;
 }
 /*style the kit tables*/
+.kitTable{
+  width:100%;
+}
 .kitTable > tbody > tr >td{
 	width: 25%;
 }
@@ -110,6 +104,18 @@ body {
 .titleColumn{
 	display: none;
 }
+
+.kit-status, .kit-error{
+  display:none;
+  font-weight:bold;
+}
+
+.bundleVariant{
+  font-weight:bold;
+}
+
+
+
 /*media queries for different size devices*/
 @media (min-width: 321px){
 	.componentLabel{
@@ -117,6 +123,7 @@ body {
 	}
 	
 }
+
 
 @media (min-width: 400px){
 	.componentLabel{
@@ -130,19 +137,26 @@ body {
 	
 }
 
+@media (min-width: 370px){
+	.bundle-button p{
+      max-width:300px;
+  	}
+	
+}
+
+@media (min-width: 500px){
+	.bundle-button p{
+      max-width:450px;
+  	}
+	
+}
+
 @media (min-width: 600px){
 
 	.priceColumn{
 		display: table-cell;
 	}
-	
-	.quantityContainer{
-		float: right;
-	}
-
-	.variantSelect{
-		float: right;
-	}
+  	
 }
 
 
@@ -163,10 +177,17 @@ body {
 		max-width: none;
 		width:15px;
 	}
+  	.quantityContainer{
+      	float: right;
+  	}
+  
+  	.variantSelect{
+		float: right;
+	}
 	
 }
 
-@media (min-width: 800px){
+@media (min-width: 850px){
 	.bundle-selector-content{
 		transition: height 500ms;
 		-webkit-transition: 500ms;
@@ -197,16 +218,26 @@ body {
 
 }
 
+@media (max-width: 990px) and (min-width: 800px){
+  .bundle-button p{
+      max-width:300px;
+  }	
+
+}
+
 @media (min-width: 1000px){
 	.componentLabel{
 		max-width: 800px;
 	}
 
 	.componentImage{
-		width: 60%;
+		width: 70%;
 	}
 
 	.componentLabel{
 		margin-left: 0px;
 	}
+    .variantSelect{
+        min-width:100px;
+    }
 }
