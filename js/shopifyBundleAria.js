@@ -1,10 +1,38 @@
+function Base_Kit_Handler(variantSelector){
+  if(variantSelector && variantSelector.includes('product__size')){
+		this.variantSelector = document.getElementsByClassName(variantSelector);
+	}
+	else if(variantSelector && variantSelector.includes('single-option-selector')){
+		this.variantSelector = this.findSelect(document.getElementsByClassName(variantSelector));
+	}
+	else{
+		this.variantSelector = undefined;
+	}
+  
+  if(this.variantSelector){
+    this.initVariantSelector(this.variantSelector);
+  }
+}
+
+//initialze variant selector if there are varaints for the product
+//use variants as base kits
+Base_Kit_Handler.prototype.initVariantSelector = function(elements){
+	console.log('init variant selector in new class',elements);
+
+};
+//find the select element if using dropdown
+Base_Kit_Handler.prototype.findSelect = function(elements){
+	console.log('find select');
+};
 /*
 initialize the kitbuilder class
 takes in string arguments of ids/classes to target with this functionality
 all the properties are set here and methods are defined below it
 button initializers are used to add event listeners to the buttons
 */
-function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass){
+function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,variantSelector){
+	
+
 	this.kitContainer = document.getElementById(containerID);
 	this.bundleButtons = document.getElementsByClassName(buttonClass);
 	this.plusButtons = document.getElementsByClassName(plusClass);
@@ -20,7 +48,6 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
   	this.priceLabels = document.getElementsByClassName(priceLabelClass);
  	//prices are the hidden prices for calculations
   	this.prices = document.getElementsByClassName(componentPriceLabelClass);
-  	//console.log(this.prices);
   	//these are the price labels for each component only used for changing variant price
   	this.componentPriceLabels = document.getElementsByClassName(priceClass);
  	this.baseKitClass = baseKitClass;
@@ -35,7 +62,10 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
 	this.initButtons(this.bundleButtons);
   	this.initSelects(this.variantSelects);
 	this.initWindowListener();  
-  
+  	if(variantSelector){
+      console.log('create class');
+  		this.base_kits = new Base_Kit_Handler(variantSelector);
+  	}
 }
 //used to get the heights of the dropdown sections then set the heights to zero if none of them are open, parameter is required becuase this method is reused to recalculate heights when window size is changed, 
 //use the scroll height because content is being cut off and hidden
@@ -51,7 +81,6 @@ kitBuilder.prototype.getHeights = function(isOpen){
           	this.bundleContentElements[i].style.visibility = "hidden";
 		}			
 	}
-
 	return heights;
 };
 
@@ -129,7 +158,6 @@ kitBuilder.prototype.getLabelPrice = function(){
 kitBuilder.prototype.updateKitPrice = function(kitQuantity){
 
   var totalPrice = 0;
-	//console.log(currentValues);
   for(var i = 0;i < this.quantities.length;i++){
     var componentPrice = parseFloat(this.prices[i].value.replace("$","")) * parseInt(this.quantities[i].value);
     totalPrice += componentPrice
@@ -138,7 +166,6 @@ kitBuilder.prototype.updateKitPrice = function(kitQuantity){
 
   var finalPrice = totalPrice * kitQuantity;
   finalPrice = Math.round(finalPrice * 100) / 100
-  console.log(finalPrice,kitQuantity);
   return finalPrice;
 
 };
@@ -149,6 +176,9 @@ kitBuilder.prototype.setPriceLabel = function(priceLabels,newPrice){
     if(newPrice % 1 === 0 ){
        priceLabels[i].innerText = "$" + (newPrice) + ".00";
        
+    }
+    else if((newPrice * 10) % 1 === 0){
+      priceLabels[i].innerText = "$" + (newPrice) + "0";
     }
     else{
       priceLabels[i].innerText = "$" + (newPrice);
@@ -244,7 +274,6 @@ kitBuilder.prototype.getQuantities = function(){
         closedBundles.push(i);
       }		
 	}
-  	console.log(this.prices);
     for(var i = 0;i < this.quantities.length;i++){
       //quantities.push(this.quantities[i].value);
       currentValues.quantities.push(this.quantities[i].value);
@@ -311,7 +340,6 @@ kitBuilder.prototype.windowResized = function(event){
 	for(var i =0; i < this.bundleContentElements.length;i++){
 		
 		if(this.bundleContentElements[i].style.height !== "0px"){
-			//console.log("first loop ",this.bundleContentElements[i].style.height);
 			this.bundleContentElements[i].style.height = "auto";
 		}
 	}
@@ -320,7 +348,6 @@ kitBuilder.prototype.windowResized = function(event){
 	for(var i =0; i < this.bundleContentElements.length;i++){
 		
 		if(this.bundleContentElements[i].style.height !== "0px"){
-			//console.log(this.bundleContentElements[i].scrollHeight);
 			this.bundleContentElements[i].style.height = this.bundleContentElements[i].scrollHeight + "px";
 		}
 	}
@@ -332,14 +359,10 @@ kitBuilder.prototype.buttonClicked = function(event){
 
 	event.preventDefault();
 	var optionContent = event.currentTarget.nextElementSibling;
-	//console.log("button ", optionContent);
 	var arrowIcon = event.currentTarget.children[1];
-  	//console.log(event.currentTarget.attributes);
-	//console.log(event.currentTarget.attributes["aria-expanded"].value);
 	if(optionContent.style.height === "0px"){
 		arrowIcon.style.transform = "rotate(180deg)";
 		var bundleId = event.currentTarget.dataset.bundleid;
-		//console.log(this.bundleHeights, bundleId);
       	optionContent.style.visibility="visible";
 		event.currentTarget.attributes["aria-expanded"].value = "true";
       	setTimeout(function(){
@@ -362,7 +385,6 @@ kitBuilder.prototype.buttonClicked = function(event){
 	
 };
 
-function initKit(){
-	var kit1 = new kitBuilder("bundle-container1","bundle-button","bundle-selector-content","plusIcon","minusIcon","kit_quantity","variantSelect","product_placeholder","product__price","component_price","currentQuantity","price","baseKit");
+function initKit(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,variantSelector){
+	var kit1 = new kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,variantSelector);
 }
-
