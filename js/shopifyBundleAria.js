@@ -2,7 +2,7 @@
 function Base_Kit_Handler(variantSelector,kitInstance,productVariants,productKitOptions){
 	this.kitInstance = kitInstance;
 	this.variantChangedEvent;
-	this.mapMetafieldMap;
+	this.metafieldMap;
 	console.log('kitInstance.kitContainer',kitInstance.kitContainer,productVariants,productKitOptions);
  	if(variantSelector && variantSelector.includes('product__size')){
 		this.variantSelector = document.getElementsByClassName(variantSelector);
@@ -15,21 +15,33 @@ function Base_Kit_Handler(variantSelector,kitInstance,productVariants,productKit
 	}
   
 	if(this.variantSelector){
-		this.mapMetafieldMap = this.mapMetafields();
+		this.metafieldMap = this.mapMetafields(productVariants,productKitOptions.base_kits);
+		console.log(this.metafieldMap);
 		this.getCurrentVariant(this.variantSelector);
 		this.initVariantSelector(this.variantSelector);
 	}
 }
 
-Base_Kit_Handler.prototype.mapMetafields = function(elements){
+Base_Kit_Handler.prototype.mapMetafields = function(productVariants,baseKits){
+	let mapVariants = {};
+	for(let i = 0;i < productVariants.length;i++){
+		for(let k = 0;k < baseKits.length;k++){
+			if(productVariants[i].id === baseKits[k].variant_id){
+				//i = product variant index, k = metafield index
+				mapVariants[i] = k;
+				break;
+			}
+		}
+	}
 
+	return mapVariants;
 };
 
 Base_Kit_Handler.prototype.getCurrentVariant = function(elements){
 	for(let i = 0;i < elements.length;i++){
 		let currentChild = elements[i].firstElementChild;
 		if(currentChild.checked){
-			console.log('checked index: ',i);
+			//console.log('checked index: ',i);
 			return i;
 		}
 	}
