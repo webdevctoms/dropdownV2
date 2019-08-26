@@ -1,4 +1,7 @@
-function Base_Kit_Handler(variantSelector){
+//class to assist in handling base kits
+function Base_Kit_Handler(variantSelector,kitInstance){
+	this.kitInstance = kitInstance;
+	this.variantChangedEvent;
   if(variantSelector && variantSelector.includes('product__size')){
 		this.variantSelector = document.getElementsByClassName(variantSelector);
 	}
@@ -14,16 +17,26 @@ function Base_Kit_Handler(variantSelector){
   }
 }
 
+Base_Kit_Handler.prototype.handleSelect = function(event){
+	console.log('select changed',event.currentTarget);
+};
+
 //initialze variant selector if there are varaints for the product
 //use variants as base kits
 Base_Kit_Handler.prototype.initVariantSelector = function(elements){
 	console.log('init variant selector in new class',elements);
-
+	//for swatch
+	for(let i = 0;i < elements.length;i++){
+		elements[i].addEventListener("mouseup",function(e){
+			this.handleSelect(e);
+		}.bind(this),false);
+	}
 };
 //find the select element if using dropdown
 Base_Kit_Handler.prototype.findSelect = function(elements){
 	console.log('find select');
 };
+
 /*
 initialize the kitbuilder class
 takes in string arguments of ids/classes to target with this functionality
@@ -32,7 +45,6 @@ button initializers are used to add event listeners to the buttons
 */
 function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,variantSelector){
 	
-
 	this.kitContainer = document.getElementById(containerID);
 	this.bundleButtons = document.getElementsByClassName(buttonClass);
 	this.plusButtons = document.getElementsByClassName(plusClass);
@@ -67,6 +79,8 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
   		this.base_kits = new Base_Kit_Handler(variantSelector);
   	}
 }
+
+
 //used to get the heights of the dropdown sections then set the heights to zero if none of them are open, parameter is required becuase this method is reused to recalculate heights when window size is changed, 
 //use the scroll height because content is being cut off and hidden
 kitBuilder.prototype.getHeights = function(isOpen){
