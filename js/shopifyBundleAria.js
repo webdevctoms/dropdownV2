@@ -1,8 +1,10 @@
 //class to assist in handling base kits
-function Base_Kit_Handler(variantSelector,kitInstance){
+function Base_Kit_Handler(variantSelector,kitInstance,productVariants,productKitOptions){
 	this.kitInstance = kitInstance;
 	this.variantChangedEvent;
-  if(variantSelector && variantSelector.includes('product__size')){
+	this.mapMetafieldMap;
+	console.log('kitInstance.kitContainer',kitInstance.kitContainer,productVariants,productKitOptions);
+ 	if(variantSelector && variantSelector.includes('product__size')){
 		this.variantSelector = document.getElementsByClassName(variantSelector);
 	}
 	else if(variantSelector && variantSelector.includes('single-option-selector')){
@@ -12,10 +14,26 @@ function Base_Kit_Handler(variantSelector,kitInstance){
 		this.variantSelector = undefined;
 	}
   
-  if(this.variantSelector){
-    this.initVariantSelector(this.variantSelector);
-  }
+	if(this.variantSelector){
+		this.mapMetafieldMap = this.mapMetafields();
+		this.getCurrentVariant(this.variantSelector);
+		this.initVariantSelector(this.variantSelector);
+	}
 }
+
+Base_Kit_Handler.prototype.mapMetafields = function(elements){
+
+};
+
+Base_Kit_Handler.prototype.getCurrentVariant = function(elements){
+	for(let i = 0;i < elements.length;i++){
+		let currentChild = elements[i].firstElementChild;
+		if(currentChild.checked){
+			console.log('checked index: ',i);
+			return i;
+		}
+	}
+};
 
 Base_Kit_Handler.prototype.handleSelect = function(event){
 	console.log('select changed',event.currentTarget);
@@ -43,7 +61,7 @@ takes in string arguments of ids/classes to target with this functionality
 all the properties are set here and methods are defined below it
 button initializers are used to add event listeners to the buttons
 */
-function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,variantSelector){
+function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass){
 	
 	this.kitContainer = document.getElementById(containerID);
 	this.bundleButtons = document.getElementsByClassName(buttonClass);
@@ -74,10 +92,7 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
 	this.initButtons(this.bundleButtons);
   	this.initSelects(this.variantSelects);
 	this.initWindowListener();  
-  	if(variantSelector){
-      console.log('create class');
-  		this.base_kits = new Base_Kit_Handler(variantSelector);
-  	}
+  	
 }
 
 
@@ -399,6 +414,9 @@ kitBuilder.prototype.buttonClicked = function(event){
 	
 };
 
-function initKit(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,variantSelector){
-	var kit1 = new kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,variantSelector);
+function initKit(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,variantSelector,productVariants,productKitOptions){
+	var kit1 = new kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass);
+	if(variantSelector){
+  		this.base_kits = new Base_Kit_Handler(variantSelector,kit1,productVariants,productKitOptions);
+  	}
 }
