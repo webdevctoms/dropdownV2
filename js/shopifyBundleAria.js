@@ -22,7 +22,7 @@ function Base_Kit_Handler(variantSelector,kitInstance,productVariants,productKit
 	if(this.variantSelector){
 		this.metafieldMap = this.mapMetafields(productVariants,productKitOptions.base_kits);
 		
-		let selectedVariant = this.getCurrentVariant(this.variantSelector);
+		var selectedVariant = this.getCurrentVariant(this.variantSelector);
 		this.initVariantSelector(this.variantSelector);
 		console.log(this.metafieldMap,this.metafieldMap[selectedVariant]);
 		this.setBaseKit(this.productKitOptions.base_kits[this.metafieldMap[selectedVariant]]);
@@ -32,18 +32,19 @@ function Base_Kit_Handler(variantSelector,kitInstance,productVariants,productKit
 //check if product is a variant
 Base_Kit_Handler.prototype.checkVariantSelects = function(variantId,quantity){
 	//new data to be placed in the kit builder
-	let data = {};
-	for(let i = 0;i < this.variantSelects.length;i++){
-		console.dir(this.variantSelects[i]);
-		let currentSelect = this.variantSelects[i];
-		for(let k = 0;k < currentSelect.children.length;k++){
+	var data = {};
+	for(var i = 0;i < this.variantSelects.length;i++){
+		//console.dir(this.variantSelects[i]);
+		var currentSelect = this.variantSelects[i];
+		for(var k = 0;k < currentSelect.children.length;k++){
 			//0 will be variant_id, if it is not then would need to add for loop
-			let optionValue = currentSelect.children[i].attributes.variant_id.value;
-			if(optionValue == variantId){
+			var optionValue = currentSelect.children[k];
+			if(optionValue.attributes.variant_id.value == variantId){
 				//console.log('option id',optionValue,variantId);
 				data.quantity = quantity;
 				data.variant_id = variantId;
 				data.productIndex = currentSelect.dataset.selectid;
+				data.price = optionValue.attributes.variant_price.value;
 				return data;
 			}
 		}
@@ -54,10 +55,10 @@ Base_Kit_Handler.prototype.checkVariantSelects = function(variantId,quantity){
 //check inputs for the variant ID
 Base_Kit_Handler.prototype.checkProductInputs = function(variantId,quantity){
 	//new data to be placed in the kit builder
-	let data = {};
-	for(let i = 0;i < this.productInputs.length;i++){
+	var data = {};
+	for(var i = 0;i < this.productInputs.length;i++){
 		//console.dir(this.productInputs[i]);
-		let currentInput = this.productInputs[i];
+		var currentInput = this.productInputs[i];
 		if(currentInput.attributes.variant_id.value == variantId){
 			data.quantity = quantity;
 			data.variant_id = variantId;
@@ -74,31 +75,32 @@ Base_Kit_Handler.prototype.checkProductInputs = function(variantId,quantity){
 Base_Kit_Handler.prototype.setBaseKit = function(kitOptions){
 	//this.checkVariantSelects();
 	console.log('kit options',kitOptions);
-	let productData = [];
-	for(let i = 0;i < kitOptions.products.length;i++){
-		let currentVariant = kitOptions.products[i];
-		let newProductData = this.checkProductInputs(currentVariant.id,currentVariant.quantity);
+	var productData = [];
+	for(var i = 0;i < kitOptions.products.length;i++){
+		var currentVariant = kitOptions.products[i];
+		var newProductData = this.checkProductInputs(currentVariant.id,currentVariant.quantity);
 		if(newProductData){
 			productData.push(newProductData);
 		}
 	}
 
-	for (let i = 0; i < kitOptions.products.length; i++) {
-		let currentVariant = kitOptions.products[i];
-		let newProductData = this.checkVariantSelects(currentVariant.id,currentVariant.quantity);
+	for (var i = 0; i < kitOptions.products.length; i++) {
+		var currentVariant = kitOptions.products[i];
+		var newProductData = this.checkVariantSelects(currentVariant.id,currentVariant.quantity);
 		if(newProductData){
 			productData.push(newProductData);
 		}
 	}
 
-	console.log('productData',productData);
+	//console.log('productData',productData);
+	this.kitInstance.updateBaseKit(productData)
 };
 
 Base_Kit_Handler.prototype.mapMetafields = function(productVariants,baseKits){
-	let mapVariants = {};
+	var mapVariants = {};
 
-	for(let i = 0;i < productVariants.length;i++){
-		for(let k = 0;k < baseKits.length;k++){
+	for(var i = 0;i < productVariants.length;i++){
+		for(var k = 0;k < baseKits.length;k++){
 			if(productVariants[i].id === baseKits[k].variant_id){
 				//i = product variant index, k = metafield index
 				mapVariants[i] = k;
@@ -111,8 +113,8 @@ Base_Kit_Handler.prototype.mapMetafields = function(productVariants,baseKits){
 };
 
 Base_Kit_Handler.prototype.getCurrentVariant = function(elements){
-	for(let i = 0;i < elements.length;i++){
-		let currentChild = elements[i].firstElementChild;
+	for(var i = 0;i < elements.length;i++){
+		var currentChild = elements[i].firstElementChild;
 		if(currentChild.checked){
 			//console.log('checked index: ',i);
 			return i;
@@ -129,7 +131,7 @@ Base_Kit_Handler.prototype.handleSelect = function(event){
 Base_Kit_Handler.prototype.initVariantSelector = function(elements){
 	console.log('init variant selector in new class',elements);
 	//for swatch
-	for(let i = 0;i < elements.length;i++){
+	for(var i = 0;i < elements.length;i++){
 		elements[i].addEventListener("mouseup",function(e){
 			this.handleSelect(e);
 		}.bind(this),false);
@@ -180,6 +182,26 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
   	
 }
 
+//method called from base kit handler
+kitBuilder.prototype.updateBaseKit = function(productData){
+	console.log('updating base kit',productData);
+	this.updateInputs(productData);
+};
+//update hidden inputs used for pushing to cart
+kitBuilder.prototype.updateInputs = function(productData){
+	console.log('updating inputs',productData,this.productInputs,this.quantities,this.prices);
+	for (var i = 0; i < productData.length; i++) {
+		let currentData = productData[i];
+		//update with the new id
+		this.productInputs[currentData.productIndex].attributes.variant_id.value = currentData.variant_id;
+		//update with the new quantities
+		this.quantities[currentData.productIndex].value = currentData.quantity;
+		//update with the new price
+		if(currentData.price){
+			this.prices[currentData.productIndex].value = currentData.price;
+		}
+	}
+};
 
 //used to get the heights of the dropdown sections then set the heights to zero if none of them are open, parameter is required becuase this method is reused to recalculate heights when window size is changed, 
 //use the scroll height because content is being cut off and hidden
