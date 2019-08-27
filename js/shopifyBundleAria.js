@@ -187,6 +187,7 @@ kitBuilder.prototype.updateBaseKit = function(productData){
 	console.log('updating base kit',productData);
 	this.updateInputs(productData);
 	this.updateSelects(productData);
+	this.setPriceLabel(this.priceLabels,this.initPriceLabel(this.prices,this.quantities));
 };
 
 //update hidden inputs used for pushing to cart
@@ -363,7 +364,7 @@ kitBuilder.prototype.initPriceLabel = function(prices,quantities){
       newPrice += productPrice;
     }
   }
-
+  newPrice = Math.round(newPrice * 100) / 100
   return newPrice;
   
 };
