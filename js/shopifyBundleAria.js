@@ -148,7 +148,7 @@ takes in string arguments of ids/classes to target with this functionality
 all the properties are set here and methods are defined below it
 button initializers are used to add event listeners to the buttons
 */
-function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass){
+function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,quantityLabelClass){
 	
 	this.kitContainer = document.getElementById(containerID);
 	this.bundleButtons = document.getElementsByClassName(buttonClass);
@@ -156,6 +156,7 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
 	this.minusButtons = document.getElementsByClassName(minusClass);
   	this.quantities = document.getElementsByClassName(quantityClass);
   	
+  	this.quantityLabels = document.getElementsByClassName(quantityLabelClass);
 	this.bundleContentElements = document.getElementsByClassName(bundleSelectorClass);
   	this.variantSelects = document.getElementsByClassName(variantClass);
   	this.productInputs = document.getElementsByClassName(productInputClass);
@@ -187,20 +188,30 @@ kitBuilder.prototype.updateBaseKit = function(productData){
 	console.log('updating base kit',productData);
 	this.updateInputs(productData);
 };
+
 //update hidden inputs used for pushing to cart
+//also updates quantity labels and price labels
 kitBuilder.prototype.updateInputs = function(productData){
-	console.log('updating inputs',productData,this.productInputs,this.quantities,this.prices);
+	//console.log('updating inputs',productData,this.priceLabels);
 	for (var i = 0; i < productData.length; i++) {
 		let currentData = productData[i];
 		//update with the new id
 		this.productInputs[currentData.productIndex].attributes.variant_id.value = currentData.variant_id;
 		//update with the new quantities
 		this.quantities[currentData.productIndex].value = currentData.quantity;
+		//update quantity label
+		this.quantityLabels[currentData.productIndex].textContent = currentData.quantity;
 		//update with the new price
 		if(currentData.price){
 			this.prices[currentData.productIndex].value = currentData.price;
+			this.componentPriceLabels[currentData.productIndex].innerText = currentData.price;
 		}
 	}
+};
+
+kitBuilder.prototype.updateSelects = function(productData){
+	console.log('updating inputs',productData,this.productInputs,this.quantities,this.prices);
+
 };
 
 //used to get the heights of the dropdown sections then set the heights to zero if none of them are open, parameter is required becuase this method is reused to recalculate heights when window size is changed, 
@@ -521,8 +532,8 @@ kitBuilder.prototype.buttonClicked = function(event){
 	
 };
 //future just pass a options object with all these classes
-function initKit(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,variantSelector,productVariants,productKitOptions){
-	var kit1 = new kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass);
+function initKit(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,variantSelector,productVariants,productKitOptions,quantityLabelClass){
+	var kit1 = new kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,quantityLabelClass);
 	if(variantSelector){
   		this.base_kits = new Base_Kit_Handler(variantSelector,kit1,productVariants,productKitOptions,variantClass,productInputClass);
   	}
