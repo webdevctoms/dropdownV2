@@ -24,7 +24,7 @@ function Base_Kit_Handler(variantSelector,kitInstance,productVariants,productKit
 		
 		var selectedVariant = this.getCurrentVariant(this.variantSelector);
 		this.initVariantSelector(this.variantSelector);
-		console.log(this.metafieldMap,this.metafieldMap[selectedVariant]);
+		console.log(this.metafieldMap);
 		this.setBaseKit(this.productKitOptions.base_kits[this.metafieldMap[selectedVariant]]);
 	}
 }
@@ -124,6 +124,8 @@ Base_Kit_Handler.prototype.getCurrentVariant = function(elements){
 
 Base_Kit_Handler.prototype.handleSelect = function(event){
 	console.log('select changed',event.currentTarget);
+	var selectedVariant = this.getCurrentVariant(this.variantSelector);
+	this.setBaseKit(this.productKitOptions.base_kits[this.metafieldMap[selectedVariant]]);
 };
 
 //initialze variant selector if there are varaints for the product
@@ -132,7 +134,7 @@ Base_Kit_Handler.prototype.initVariantSelector = function(elements){
 	console.log('init variant selector in new class',elements);
 	//for swatch
 	for(var i = 0;i < elements.length;i++){
-		elements[i].addEventListener("mouseup",function(e){
+		elements[i].addEventListener("click",function(e){
 			this.handleSelect(e);
 		}.bind(this),false);
 	}
@@ -185,9 +187,36 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
 //method called from base kit handler
 kitBuilder.prototype.updateBaseKit = function(productData){
 	console.log('updating base kit',productData);
+	this.zeroInputs();
+	this.zeroSelects();
 	this.updateInputs(productData);
 	this.updateSelects(productData);
+	//reinit price
 	this.setPriceLabel(this.priceLabels,this.initPriceLabel(this.prices,this.quantities));
+};
+//don't need to reset ids for most since most aren't variants
+kitBuilder.prototype.zeroInputs = function(){
+	for (var i = 0; i < this.productInputs.length; i++) {
+		this.quantities[i].value = 0;
+		this.quantityLabels[i].textContent = 0;
+	}
+};
+
+kitBuilder.prototype.zeroSelects = function(){
+	for (var i = 0; i < this.variantSelects.length; i++) {
+		let currentSelect = this.variantSelects[i];
+		let productId = currentSelect.options[0].attributes.selectid;
+		let productIndex = currentSelect.dataset.selectid;
+		let currentPrice = currentSelect.options[0].attributes.variant_price.value;
+		//set select to first option
+		currentSelect.selectedIndex = 0;
+		//set input id to first option
+		this.productInputs[productIndex].attributes.variant_id.value = productId;
+		//set price input to first price
+		this.prices[productIndex].value = currentPrice;
+		//set price label to first price
+		this.componentPriceLabels[productIndex].innerText = currentPrice;
+	}
 };
 
 //update hidden inputs used for pushing to cart
@@ -197,6 +226,7 @@ kitBuilder.prototype.updateInputs = function(productData){
 	for (var i = 0; i < productData.length; i++) {
 		let currentData = productData[i];
 		//update with the new id
+		//console.dir(this.productInputs[currentData.productIndex]);
 		this.productInputs[currentData.productIndex].attributes.variant_id.value = currentData.variant_id;
 		//update with the new quantities
 		this.quantities[currentData.productIndex].value = currentData.quantity;
@@ -208,11 +238,6 @@ kitBuilder.prototype.updateInputs = function(productData){
 			this.componentPriceLabels[currentData.productIndex].innerText = currentData.price;
 		}
 	}
-};
-
-kitBuilder.prototype.updatePrice = function(productData){
-	console.log('updating inputs',this.variantSelects);
-	
 };
 
 kitBuilder.prototype.updateSelects = function(productData){
