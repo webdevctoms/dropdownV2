@@ -169,7 +169,6 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
   	//these are the price labels for each component only used for changing variant price
   	this.componentPriceLabels = document.getElementsByClassName(priceClass);
  	this.baseKitClass = baseKitClass;
-  	this.basePrice = parseFloat(this.priceLabels[0].innerText.replace("$",""));
  	this.setPriceLabel(this.priceLabels,this.initPriceLabel(this.prices,this.quantities));
 	this.bundleHeights = this.getHeights();
 	this.bundleSelectorClass = bundleSelectorClass;
@@ -187,6 +186,7 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
 kitBuilder.prototype.updateBaseKit = function(productData){
 	console.log('updating base kit',productData);
 	this.updateInputs(productData);
+	this.updateSelects(productData);
 };
 
 //update hidden inputs used for pushing to cart
@@ -209,9 +209,28 @@ kitBuilder.prototype.updateInputs = function(productData){
 	}
 };
 
-kitBuilder.prototype.updateSelects = function(productData){
-	console.log('updating inputs',productData,this.productInputs,this.quantities,this.prices);
+kitBuilder.prototype.updatePrice = function(productData){
+	console.log('updating inputs',this.variantSelects);
+	
+};
 
+kitBuilder.prototype.updateSelects = function(productData){
+	//console.log('updating inputs',this.variantSelects);
+	for (var i = 0; i < productData.length; i++) {
+		let currentData = productData[i];
+		for (var k = 0; k < this.variantSelects.length; k++) {
+			let selectId = this.variantSelects[k].dataset.selectid;
+			if(selectId == currentData.productIndex){
+				for (var j = 0; j < this.variantSelects[k].options.length; j++) {
+					let optionVariantId = this.variantSelects[k].options[j].attributes.variant_id.value;
+					if(optionVariantId == currentData.variant_id){
+						this.variantSelects[k].selectedIndex = j;
+						break;
+					}
+				}
+			}
+		}
+	}
 };
 
 //used to get the heights of the dropdown sections then set the heights to zero if none of them are open, parameter is required becuase this method is reused to recalculate heights when window size is changed, 
