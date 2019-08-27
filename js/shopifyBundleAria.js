@@ -1,8 +1,13 @@
 //class to assist in handling base kits
-function Base_Kit_Handler(variantSelector,kitInstance,productVariants,productKitOptions){
+function Base_Kit_Handler(variantSelector,kitInstance,productVariants,productKitOptions,variantClass,productInputClass){
 	this.kitInstance = kitInstance;
 	this.variantChangedEvent;
+	//keys = variant index, values = metafield index
 	this.metafieldMap;
+	this.productVariants = productVariants;
+	this.productKitOptions = productKitOptions;
+	this.productInputs = document.getElementsByClassName(productInputClass);
+	this.variantSelects = document.getElementsByClassName(variantClass);
 	console.log('kitInstance.kitContainer',kitInstance.kitContainer,productVariants,productKitOptions);
  	if(variantSelector && variantSelector.includes('product__size')){
 		this.variantSelector = document.getElementsByClassName(variantSelector);
@@ -16,14 +21,82 @@ function Base_Kit_Handler(variantSelector,kitInstance,productVariants,productKit
   
 	if(this.variantSelector){
 		this.metafieldMap = this.mapMetafields(productVariants,productKitOptions.base_kits);
-		console.log(this.metafieldMap);
-		this.getCurrentVariant(this.variantSelector);
+		
+		let selectedVariant = this.getCurrentVariant(this.variantSelector);
 		this.initVariantSelector(this.variantSelector);
+		console.log(this.metafieldMap,this.metafieldMap[selectedVariant]);
+		this.setBaseKit(this.productKitOptions.base_kits[this.metafieldMap[selectedVariant]]);
 	}
 }
 
+//check if product is a variant
+Base_Kit_Handler.prototype.checkVariantSelects = function(variantId,quantity){
+	//new data to be placed in the kit builder
+	let data = {};
+	for(let i = 0;i < this.variantSelects.length;i++){
+		console.dir(this.variantSelects[i]);
+		let currentSelect = this.variantSelects[i];
+		for(let k = 0;k < currentSelect.children.length;k++){
+			//0 will be variant_id, if it is not then would need to add for loop
+			let optionValue = currentSelect.children[i].attributes.variant_id.value;
+			if(optionValue == variantId){
+				//console.log('option id',optionValue,variantId);
+				data.quantity = quantity;
+				data.variant_id = variantId;
+				data.productIndex = currentSelect.dataset.selectid;
+				return data;
+			}
+		}
+	}
+
+	return false;
+};
+//check inputs for the variant ID
+Base_Kit_Handler.prototype.checkProductInputs = function(variantId,quantity){
+	//new data to be placed in the kit builder
+	let data = {};
+	for(let i = 0;i < this.productInputs.length;i++){
+		//console.dir(this.productInputs[i]);
+		let currentInput = this.productInputs[i];
+		if(currentInput.attributes.variant_id.value == variantId){
+			data.quantity = quantity;
+			data.variant_id = variantId;
+			data.productIndex = currentInput.dataset.quantityid;	
+
+			return data;
+		}
+	}
+
+	return false;
+};
+
+//handle all functions from kit instance for updating the kit builder
+Base_Kit_Handler.prototype.setBaseKit = function(kitOptions){
+	//this.checkVariantSelects();
+	console.log('kit options',kitOptions);
+	let productData = [];
+	for(let i = 0;i < kitOptions.products.length;i++){
+		let currentVariant = kitOptions.products[i];
+		let newProductData = this.checkProductInputs(currentVariant.id,currentVariant.quantity);
+		if(newProductData){
+			productData.push(newProductData);
+		}
+	}
+
+	for (let i = 0; i < kitOptions.products.length; i++) {
+		let currentVariant = kitOptions.products[i];
+		let newProductData = this.checkVariantSelects(currentVariant.id,currentVariant.quantity);
+		if(newProductData){
+			productData.push(newProductData);
+		}
+	}
+
+	console.log('productData',productData);
+};
+
 Base_Kit_Handler.prototype.mapMetafields = function(productVariants,baseKits){
 	let mapVariants = {};
+
 	for(let i = 0;i < productVariants.length;i++){
 		for(let k = 0;k < baseKits.length;k++){
 			if(productVariants[i].id === baseKits[k].variant_id){
@@ -425,10 +498,10 @@ kitBuilder.prototype.buttonClicked = function(event){
 	}	
 	
 };
-
+//future just pass a options object with all these classes
 function initKit(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,variantSelector,productVariants,productKitOptions){
 	var kit1 = new kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass);
 	if(variantSelector){
-  		this.base_kits = new Base_Kit_Handler(variantSelector,kit1,productVariants,productKitOptions);
+  		this.base_kits = new Base_Kit_Handler(variantSelector,kit1,productVariants,productKitOptions,variantClass,productInputClass);
   	}
 }
