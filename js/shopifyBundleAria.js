@@ -171,11 +171,11 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
   	//these are the price labels for each component only used for changing variant price
   	this.componentPriceLabels = document.getElementsByClassName(priceClass);
  	this.baseKitClass = baseKitClass;
- 	this.setPriceLabel(this.priceLabels,this.initPriceLabel(this.prices,this.quantities));
 	this.bundleHeights = this.getHeights();
 	this.bundleSelectorClass = bundleSelectorClass;
   	this.kitQuantity = document.getElementById(quantityID).value;
     this.quantityID = quantityID;
+    this.setPriceLabel(this.priceLabels,this.initPriceLabel(this.prices,this.quantities));
 	this.initPlusButtons(this.plusButtons);
 	this.initMinusButtons(this.minusButtons);
 	this.initButtons(this.bundleButtons);
@@ -389,7 +389,10 @@ kitBuilder.prototype.initPriceLabel = function(prices,quantities){
       newPrice += productPrice;
     }
   }
-  newPrice = Math.round(newPrice * 100) / 100
+  
+  let quantity = document.getElementById(this.quantityID).value;
+  newPrice = newPrice * quantity;
+  newPrice = Math.round(newPrice * 100) / 100;
   return newPrice;
   
 };
