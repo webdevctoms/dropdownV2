@@ -151,6 +151,7 @@ function ProductVariantHandler(options){
 	this.singleInput = document.getElementById(options.inputId);
 	this.singleQuantity = document.getElementById(options.quantityId);
 	this.singlePrice = document.getElementById(options.priceId);
+	this.kitInstance = options.kitInstance;
 	//this.selectMap = options.selectMap;
 	this.productVariants = options.productVariants;
 	this.kitSettings = options.kitSettings;
@@ -161,8 +162,11 @@ function ProductVariantHandler(options){
 	this.selectPoductId = this.kitSettings.select_map[this.variantMap[selectedVariant]].id;
 	//active select index
 	this.activeSelect = this.displaySelect(this.selectContainers,this.selectPoductId);
-	this.setInputFields(this.activeSelect);
-	this.initListElements(this.listElements);
+	if(this.activeSelect){
+		this.setInputFields(this.activeSelect);
+		this.initListElements(this.listElements);
+	}
+	
 	console.log('variant map: ',this.variantMap,selectedVariant);
 }
 
@@ -176,6 +180,10 @@ ProductVariantHandler.prototype.initListElements = function(listElements){
 
 ProductVariantHandler.prototype.listClicked = function(e){
 	console.log('list clicked');
+	//display correct select
+	var selectedVariant = this.findListIndex(this.listElements);
+	this.selectPoductId = this.kitSettings.select_map[this.variantMap[selectedVariant]].id;
+	this.activeSelect = this.displaySelect(this.selectContainers,this.selectPoductId);
 };
 
 ProductVariantHandler.prototype.setInputFields = function(activeSelect){
@@ -225,10 +233,15 @@ ProductVariantHandler.prototype.displaySelect = function(containers,product_id){
 	var selectIndex = undefined;
 	for (var i = 0; i < containers.length; i++) {
 		var containerId = containers[i].attributes.product_id.value;
-		console.log(containerId,product_id);
-		if(containerId == product_id){
+		var firstOption = this.selects[i].options[0].value.toUpperCase();
+		if(containerId == product_id && firstOption !== 'DEFAULT TITLE'){
 			containers[i].classList.remove('hideRope');
 			selectIndex = i;
+			break;
+		}
+		else if(containerId == product_id && firstOption === 'DEFAULT TITLE'){
+			selectIndex = i;
+			break;
 		}
 	}
 	if(selectIndex !== undefined){
@@ -698,7 +711,8 @@ function initKit(containerID,buttonClass,bundleSelectorClass,plusClass,minusClas
   			listClass:'product__size',
   			inputId:'single_product_placeholder',
   			quantityId:'single_product_quantity',
-  			priceId:'single_product_price'
+  			priceId:'single_product_price',
+  			kitInstance:kit1
   		};
   		var variantHandler = new ProductVariantHandler(options);
   	}
