@@ -93,7 +93,7 @@ Base_Kit_Handler.prototype.setBaseKit = function(kitOptions){
 	}
 
 	//console.log('productData',productData);
-	this.kitInstance.updateBaseKit(productData)
+	this.kitInstance.updateBaseKit(productData);
 };
 
 Base_Kit_Handler.prototype.mapMetafields = function(productVariants,baseKits){
@@ -142,6 +142,102 @@ Base_Kit_Handler.prototype.initVariantSelector = function(elements){
 //find the select element if using dropdown
 Base_Kit_Handler.prototype.findSelect = function(elements){
 	console.log('find select');
+};
+
+//handle connecting a variant to a product
+function ProductVariantHandler(options){
+	this.selectContainers = document.getElementsByClassName(options.selectContainerClass);
+	this.selects = document.getElementsByClassName(options.selectClass);
+	this.singleInput = document.getElementById(options.inputId);
+	this.singleQuantity = document.getElementById(options.quantityId);
+	this.singlePrice = document.getElementById(options.priceId);
+	//this.selectMap = options.selectMap;
+	this.productVariants = options.productVariants;
+	this.kitSettings = options.kitSettings;
+	this.listElements = document.getElementsByClassName(options.listClass);
+	this.variantMap = this.mapVariants(this.productVariants,this.kitSettings.select_map);
+	
+	var selectedVariant = this.findListIndex(this.listElements);
+	this.selectPoductId = this.kitSettings.select_map[this.variantMap[selectedVariant]].id;
+	//active select index
+	this.activeSelect = this.displaySelect(this.selectContainers,this.selectPoductId);
+	this.setInputFields(this.activeSelect);
+	this.initListElements(this.listElements);
+	console.log('variant map: ',this.variantMap,selectedVariant);
+}
+
+ProductVariantHandler.prototype.initListElements = function(listElements){
+	for (var i = 0; i < listElements.length; i++) {
+		listElements[i].addEventListener('click',function(e){
+			this.listClicked(e);
+		}.bind(this),false);
+	}
+};
+
+ProductVariantHandler.prototype.listClicked = function(e){
+	console.log('list clicked');
+};
+
+ProductVariantHandler.prototype.setInputFields = function(activeSelect){
+	var variantId = activeSelect.options[activeSelect.selectedIndex].attributes.variant_id.value;
+	var variantPrice = activeSelect.options[activeSelect.selectedIndex].attributes.variant_price.value;
+	this.singleInput.attributes.variant_id.value = variantId;
+	this.singleQuantity.value = 1;
+	this.singlePrice.value = variantPrice;
+	//will need to call funtion that updates price
+
+};
+
+ProductVariantHandler.prototype.findListIndex = function(listElements){
+	for (var i = 0; i < listElements.length; i++) {
+		var currentChild = listElements[i].firstElementChild;
+		if(currentChild.checked){
+			return i;
+		}
+	}
+	return false;
+};
+
+
+ProductVariantHandler.prototype.mapVariants = function(variants,map){
+	var mapVariants = {};
+	for (var i = 0; i < variants.length; i++) {
+		var variant_id = variants[i].id;
+		for(var k = 0;k < map.length;k++){
+			if(map[k].variant_id == variant_id){
+				mapVariants[i] = k;
+				break;
+			}
+		}
+	}
+
+	return mapVariants;
+};
+
+ProductVariantHandler.prototype.hideSelects = function(containers){
+	for (var i = 0; i < containers.length; i++) {
+		containers[i].classList.add('hideRope');
+	}
+};
+
+ProductVariantHandler.prototype.displaySelect = function(containers,product_id){
+	this.hideSelects(containers);
+	var selectIndex = undefined;
+	for (var i = 0; i < containers.length; i++) {
+		var containerId = containers[i].attributes.product_id.value;
+		console.log(containerId,product_id);
+		if(containerId == product_id){
+			containers[i].classList.remove('hideRope');
+			selectIndex = i;
+		}
+	}
+	if(selectIndex !== undefined){
+		return this.selects[selectIndex];
+	}
+	else{
+		return undefined;
+	}
+	
 };
 
 /*
@@ -197,17 +293,19 @@ kitBuilder.prototype.updateBaseKit = function(productData){
 //don't need to reset ids for most since most aren't variants
 kitBuilder.prototype.zeroInputs = function(){
 	for (var i = 0; i < this.productInputs.length; i++) {
-		this.quantities[i].value = 0;
-		this.quantityLabels[i].textContent = 0;
+		if(this.quantityLabels[i].textContent){
+			this.quantities[i].value = 0;
+			this.quantityLabels[i].textContent = 0;
+		}
 	}
 };
 
 kitBuilder.prototype.zeroSelects = function(){
 	for (var i = 0; i < this.variantSelects.length; i++) {
-		let currentSelect = this.variantSelects[i];
-		let productId = currentSelect.options[0].attributes.selectid;
-		let productIndex = currentSelect.dataset.selectid;
-		let currentPrice = currentSelect.options[0].attributes.variant_price.value;
+		var currentSelect = this.variantSelects[i];
+		var productId = currentSelect.options[0].attributes.selectid;
+		var productIndex = currentSelect.dataset.selectid;
+		var currentPrice = currentSelect.options[0].attributes.variant_price.value;
 		//set select to first option
 		currentSelect.selectedIndex = 0;
 		//set input id to first option
@@ -224,7 +322,7 @@ kitBuilder.prototype.zeroSelects = function(){
 kitBuilder.prototype.updateInputs = function(productData){
 	//console.log('updating inputs',productData,this.priceLabels);
 	for (var i = 0; i < productData.length; i++) {
-		let currentData = productData[i];
+		var currentData = productData[i];
 		//update with the new id
 		//console.dir(this.productInputs[currentData.productIndex]);
 		this.productInputs[currentData.productIndex].attributes.variant_id.value = currentData.variant_id;
@@ -243,12 +341,12 @@ kitBuilder.prototype.updateInputs = function(productData){
 kitBuilder.prototype.updateSelects = function(productData){
 	//console.log('updating inputs',this.variantSelects);
 	for (var i = 0; i < productData.length; i++) {
-		let currentData = productData[i];
+		var currentData = productData[i];
 		for (var k = 0; k < this.variantSelects.length; k++) {
-			let selectId = this.variantSelects[k].dataset.selectid;
+			var selectId = this.variantSelects[k].dataset.selectid;
 			if(selectId == currentData.productIndex){
 				for (var j = 0; j < this.variantSelects[k].options.length; j++) {
-					let optionVariantId = this.variantSelects[k].options[j].attributes.variant_id.value;
+					var optionVariantId = this.variantSelects[k].options[j].attributes.variant_id.value;
 					if(optionVariantId == currentData.variant_id){
 						this.variantSelects[k].selectedIndex = j;
 						break;
@@ -340,13 +438,7 @@ kitBuilder.prototype.initSelects = function(selects){
 		}.bind(this),false);
 	}
 };
-/*
-kitBuilder.prototype.getLabelPrice = function(){
-  var priceLabels = document.getElementsByClassName(this.priceLabelClass);
-  var labelPrice = parseFloat(this.priceLabels[0].innerText.replace("$",""));
-  return labelPrice;
-}
-*/
+
 kitBuilder.prototype.updateKitPrice = function(kitQuantity){
 
   var totalPrice = 0;
@@ -390,7 +482,7 @@ kitBuilder.prototype.initPriceLabel = function(prices,quantities){
     }
   }
   
-  let quantity = document.getElementById(this.quantityID).value;
+  var quantity = document.getElementById(this.quantityID).value;
   newPrice = newPrice * quantity;
   newPrice = Math.round(newPrice * 100) / 100;
   return newPrice;
@@ -579,10 +671,35 @@ kitBuilder.prototype.buttonClicked = function(event){
 	}	
 	
 };
+function checkLabels(labels,text){
+	for (var i = 0; i < labels.length; i++) {
+		if(labels[i].innerText.toUpperCase() === text.toUpperCase()){
+			return true;
+		}
+	}
+	return false;
+}
 //future just pass a options object with all these classes
 function initKit(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,variantSelector,productVariants,productKitOptions,quantityLabelClass){
 	var kit1 = new kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,quantityLabelClass);
-	if(variantSelector){
-  		this.base_kits = new Base_Kit_Handler(variantSelector,kit1,productVariants,productKitOptions,variantClass,productInputClass);
+	var variantCheck = document.getElementsByClassName(variantSelector).length === 0 ? false : true;
+	var labels = document.getElementsByClassName('form__label');
+	var baseKitCheck = checkLabels(labels,'base kit');
+	var pouchCheck = checkLabels(labels,'pouch');
+	if(variantCheck && baseKitCheck){
+  		var base_kits = new Base_Kit_Handler(variantSelector,kit1,productVariants,productKitOptions,variantClass,productInputClass);
+  	}
+  	else if(variantCheck && pouchCheck){
+  		var options = {
+  			selectContainerClass:'single_product_container',
+  			selectClass:'single_product_select',
+  			productVariants,
+  			kitSettings:productKitOptions,
+  			listClass:'product__size',
+  			inputId:'single_product_placeholder',
+  			quantityId:'single_product_quantity',
+  			priceId:'single_product_price'
+  		};
+  		var variantHandler = new ProductVariantHandler(options);
   	}
 }
