@@ -164,8 +164,10 @@ function ProductVariantHandler(options){
 	this.activeSelect = this.displaySelect(this.selectContainers,this.selectPoductId);
 	if(this.activeSelect){
 		this.setInputFields(this.activeSelect);
-		this.initListElements(this.listElements);
+		
 	}
+	this.initSelects(this.selects);
+	this.initListElements(this.listElements);
 	
 	console.log('variant map: ',this.variantMap,selectedVariant);
 }
@@ -178,12 +180,28 @@ ProductVariantHandler.prototype.initListElements = function(listElements){
 	}
 };
 
+ProductVariantHandler.prototype.initSelects= function(selectElements){
+	for (var i = 0; i < selectElements.length; i++) {
+		selectElements[i].addEventListener('change',function(e){
+			this.selectChanged(e);
+		}.bind(this),false);
+	}
+};
+
+ProductVariantHandler.prototype.selectChanged= function(e){
+	console.log('select changed',e.currentTarget);
+	this.setInputFields(e.currentTarget);
+};
+
 ProductVariantHandler.prototype.listClicked = function(e){
 	console.log('list clicked');
 	//display correct select
 	var selectedVariant = this.findListIndex(this.listElements);
 	this.selectPoductId = this.kitSettings.select_map[this.variantMap[selectedVariant]].id;
 	this.activeSelect = this.displaySelect(this.selectContainers,this.selectPoductId);
+	if(this.activeSelect){
+		this.setInputFields(this.activeSelect);
+	}
 };
 
 ProductVariantHandler.prototype.setInputFields = function(activeSelect){
