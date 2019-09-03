@@ -189,7 +189,6 @@ ProductVariantHandler.prototype.initSelects= function(selectElements){
 };
 
 ProductVariantHandler.prototype.selectChanged= function(e){
-	console.log('select changed',e.currentTarget);
 	this.setInputFields(e.currentTarget);
 };
 
@@ -211,7 +210,7 @@ ProductVariantHandler.prototype.setInputFields = function(activeSelect){
 	this.singleQuantity.value = 1;
 	this.singlePrice.value = variantPrice;
 	//will need to call funtion that updates price
-
+	this.kitInstance.updatePrices(variantPrice);
 };
 
 ProductVariantHandler.prototype.findListIndex = function(listElements){
@@ -278,6 +277,9 @@ all the properties are set here and methods are defined below it
 button initializers are used to add event listeners to the buttons
 */
 function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusClass,quantityClass,variantClass,productInputClass,priceLabelClass,componentPriceLabelClass,quantityID,priceClass,baseKitClass,quantityLabelClass){
+	//property for single price
+	this.singleProductPrice = 0;
+	this.singleProductPriceValue;
 	
 	this.kitContainer = document.getElementById(containerID);
 	this.bundleButtons = document.getElementsByClassName(buttonClass);
@@ -300,8 +302,8 @@ function kitBuilder(containerID,buttonClass,bundleSelectorClass,plusClass,minusC
  	this.baseKitClass = baseKitClass;
 	this.bundleHeights = this.getHeights();
 	this.bundleSelectorClass = bundleSelectorClass;
-  	this.kitQuantity = document.getElementById(quantityID).value;
     this.quantityID = quantityID;
+    this.initialInputLength = this.quantities.length;
     this.setPriceLabel(this.priceLabels,this.initPriceLabel(this.prices,this.quantities));
 	this.initPlusButtons(this.plusButtons);
 	this.initMinusButtons(this.minusButtons);
@@ -320,6 +322,18 @@ kitBuilder.prototype.updateBaseKit = function(productData){
 	this.updateSelects(productData);
 	//reinit price
 	this.setPriceLabel(this.priceLabels,this.initPriceLabel(this.prices,this.quantities));
+};
+//called from product variant handler
+kitBuilder.prototype.updatePrices = function(price){
+	var priceValue = parseFloat(price.replace("$",""));
+	this.setSingleProductPrice(priceValue,document.getElementById(this.quantityID).value);
+	console.log('updating price',price,priceValue);
+	this.setPriceLabel(this.priceLabels,this.initPriceLabel(this.prices,this.quantities));
+};
+
+kitBuilder.prototype.setSingleProductPrice = function(priceValue,quantity){
+	this.singleProductPrice = quantity * priceValue;
+	this.singleProductPriceValue = priceValue;
 };
 //don't need to reset ids for most since most aren't variants
 kitBuilder.prototype.zeroInputs = function(){
@@ -476,10 +490,13 @@ kitBuilder.prototype.updateKitPrice = function(kitQuantity){
   for(var i = 0;i < this.quantities.length;i++){
     var componentPrice = parseFloat(this.prices[i].value.replace("$","")) * parseInt(this.quantities[i].value);
     totalPrice += componentPrice
-
+  }
+  if(this.singleProductPriceValue){
+      totalPrice += this.singleProductPriceValue;
   }
 
   var finalPrice = totalPrice * kitQuantity;
+  //finalPrice += this.singleProductPrice;
   finalPrice = Math.round(finalPrice * 100) / 100
   return finalPrice;
 
@@ -504,7 +521,7 @@ kitBuilder.prototype.setPriceLabel = function(priceLabels,newPrice){
 
 };
 
-kitBuilder.prototype.initPriceLabel = function(prices,quantities){
+kitBuilder.prototype.initPriceLabel = function(prices,quantities,singlePrice){
   var newPrice = 0;
   for(var i =0;i < prices.length;i++){
     if(quantities[i].value !== "0"){
@@ -515,6 +532,7 @@ kitBuilder.prototype.initPriceLabel = function(prices,quantities){
   
   var quantity = document.getElementById(this.quantityID).value;
   newPrice = newPrice * quantity;
+  newPrice += this.singleProductPrice;
   newPrice = Math.round(newPrice * 100) / 100;
   return newPrice;
   
@@ -724,7 +742,7 @@ function initKit(containerID,buttonClass,bundleSelectorClass,plusClass,minusClas
   		var options = {
   			selectContainerClass:'single_product_container',
   			selectClass:'single_product_select',
-  			productVariants,
+  			productVariants:productVariants,
   			kitSettings:productKitOptions,
   			listClass:'product__size',
   			inputId:'single_product_placeholder',
